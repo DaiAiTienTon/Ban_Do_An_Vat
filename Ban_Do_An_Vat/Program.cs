@@ -22,6 +22,12 @@ namespace Ban_Do_An_Vat
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
             if (!string.IsNullOrEmpty(databaseUrl))
             {
+                // Fix 07/08/2026: PostgreSQL (Npgsql) mặc định yêu cầu DateTime Kind=UTC.
+                // Khi form HTML submit datetime-local → model binder tạo Kind=Unspecified.
+                // AppContext.SetSwitch này bật "legacy mode": chấp nhận mọi Kind (Local/Unspecified/Utc)
+                // mà không throw exception — tương thích ngược với toàn bộ code hiện tại.
+                // Chỉ kích hoạt khi dùng PostgreSQL (Render), không ảnh hưởng SQL Server (local).
+                AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 // PostgreSQL cho Render/Neon production — dùng ApplicationDbContextPostgres
                 // có migrations riêng trong Data/MigrationsPostgres/
                 // Fix 07/08/2026: Neon cấp URI format (postgresql://...) nhưng Npgsql cần
