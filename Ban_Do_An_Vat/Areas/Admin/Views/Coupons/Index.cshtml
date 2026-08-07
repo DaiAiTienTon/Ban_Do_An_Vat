@@ -1,0 +1,84 @@
+@model IEnumerable<Ban_Do_An_Vat.Models.Coupon>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Mã Giảm Giá";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-brand-forest">Mã Giảm Giá</h1>
+        <p class="text-sm text-gray-500">Quản lý các chương trình ưu đãi, mã coupon giảm giá.</p>
+    </div>
+    <a asp-action="Create" class="inline-flex items-center gap-2 bg-brand-coral text-white text-xs font-bold px-4 py-2.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-sm">
+        <i class="ph ph-plus-bold"></i>
+        <span>Tạo Mã Mới</span>
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-brand-forest/5 overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-brand-bone text-brand-forest text-sm uppercase tracking-wider">
+            <tr>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Mã Coupon</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Giá Trị Giảm</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Đơn Tối Thiểu</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Hạn Sử Dụng</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Trạng Thái</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5 text-right">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-forest/5">
+            @foreach (var item in Model)
+            {
+                var isExpired = item.ExpiryDate < DateTime.Now;
+                <tr class="hover:bg-brand-bone/30 transition-colors @(isExpired ? "opacity-60" : "")">
+                    <td class="p-4">
+                        <span class="px-3 py-1.5 bg-brand-forest text-white font-mono font-bold rounded-lg text-xs tracking-wider">
+                            @item.Code
+                        </span>
+                    </td>
+                    <td class="p-4 font-bold text-brand-coral text-sm">
+                        @if (item.DiscountType == "Percentage")
+                        {
+                            <span>@item.DiscountAmount.ToString("G0")%</span>
+                        }
+                        else
+                        {
+                            <span>@item.DiscountAmount.ToString("N0")đ</span>
+                        }
+                    </td>
+                    <td class="p-4 text-sm font-semibold text-brand-forest">
+                        @item.MinOrderAmount.ToString("N0")đ
+                    </td>
+                    <td class="p-4 text-xs font-semibold">
+                        @item.ExpiryDate.ToString("dd/MM/yyyy HH:mm")
+                        @if (isExpired)
+                        {
+                            <span class="block text-[10px] text-red-500 font-bold mt-0.5">Đã hết hạn</span>
+                        }
+                    </td>
+                    <td class="p-4">
+                        @if (item.IsActive && !isExpired)
+                        {
+                            <span class="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">Kích hoạt</span>
+                        }
+                        else
+                        {
+                            <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-bold">Tắt</span>
+                        }
+                    </td>
+                    <td class="p-4 text-right">
+                        <div class="flex gap-2 justify-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="px-3 py-1.5 rounded-full bg-brand-forest text-white hover:bg-brand-matcha text-xs font-bold transition-all shadow-sm">
+                                Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="px-3 py-1.5 rounded-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all shadow-sm">
+                                Xóa
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,90 @@
+@model Ban_Do_An_Vat.Models.Coupon
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa mã giảm giá";
+}
+
+<div class="max-w-xl mx-auto space-y-6 animate-fade-up">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <a asp-action="Index" class="w-10 h-10 rounded-full bg-white hover:bg-brand-forest/5 text-brand-forest flex items-center justify-center shadow-sm transition-colors border border-brand-forest/5">
+            <i class="ph ph-arrow-left-bold"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-brand-forest">Chỉnh Sửa Mã Giảm Giá</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Cập nhật thông tin mã ưu đãi.</p>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="p-8 rounded-[1.8rem] bg-white border border-brand-forest/5 shadow-sm">
+        <form asp-action="Edit" method="post" class="space-y-5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                    <div asp-validation-summary="ModelOnly" class="font-semibold"></div>
+                </div>
+            }
+
+            <div class="flex flex-col gap-1.5">
+                <label asp-for="Code" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Mã Giảm Giá (Không dấu, không khoảng cách)</label>
+                <input asp-for="Code" type="text"
+                       class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono uppercase" />
+                <span asp-validation-for="Code" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="DiscountType" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Loại giảm giá</label>
+                    <select asp-for="DiscountType" class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral">
+                        <option value="Percentage">Theo phần trăm (%)</option>
+                        <option value="FixedAmount">Số tiền cố định (đ)</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="DiscountAmount" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Giá trị giảm</label>
+                    <input asp-for="DiscountAmount" type="number"
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="DiscountAmount" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="MinOrderAmount" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Giá trị đơn tối thiểu (đ)</label>
+                    <input asp-for="MinOrderAmount" type="number"
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="MinOrderAmount" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="ExpiryDate" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Ngày hết hạn</label>
+                    <input asp-for="ExpiryDate" type="datetime-local" class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="ExpiryDate" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 py-2">
+                <input asp-for="IsActive" type="checkbox" id="is-active-chk"
+                       class="w-4 h-4 rounded border-brand-forest/20 text-brand-coral focus:ring-brand-coral accent-brand-coral" />
+                <label for="is-active-chk" class="text-xs font-bold uppercase tracking-wider text-brand-forest cursor-pointer">Kích hoạt mã này</label>
+            </div>
+
+            <!-- Actions buttons -->
+            <div class="flex gap-4 pt-4 border-t border-brand-forest/5">
+                <button type="submit" class="w-full bg-brand-coral text-white font-bold py-3.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20">
+                    Lưu Thay Đổi
+                </button>
+                <a asp-action="Index" class="w-full text-center border border-brand-forest/10 text-brand-forest font-bold py-3.5 rounded-full hover:bg-brand-forest/5 transition-all">
+                    Hủy bỏ
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

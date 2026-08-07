@@ -1,0 +1,241 @@
+@model Ban_Do_An_Vat.Models.Snack
+@{
+    ViewData["Title"] = Model.Name;
+    var recommendations = ViewBag.Recommendations as List<Snack> ?? new List<Snack>();
+}
+
+<section class="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-up">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-8">
+        <a asp-controller="Home" asp-action="Index" class="hover:text-brand-coral">Trang Chủ</a>
+        <i class="ph ph-caret-right"></i>
+        <a asp-controller="Snacks" asp-action="Index" class="hover:text-brand-coral">Cửa Hàng</a>
+        <i class="ph ph-caret-right"></i>
+        <a asp-controller="Snacks" asp-action="Index" asp-route-category="@Model.CategoryId" class="hover:text-brand-coral">@Model.Category?.Name</a>
+        <i class="ph ph-caret-right"></i>
+        <span class="text-brand-forest">@Model.Name</span>
+    </nav>
+
+    <!-- Product Split Screen Grid (50/50) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        
+        <!-- Left: Image Box -->
+        <div class="relative w-full aspect-square rounded-[2.5rem] bg-brand-forest/5 p-2 shadow-lg">
+            <div class="w-full h-full rounded-[2.2rem] overflow-hidden relative">
+                <img src="@Model.ImageUrl" alt="@Model.Name" class="w-full h-full object-cover" />
+                <span class="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-brand-forest text-sm font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+                    <i class="ph-fill ph-star text-yellow-500"></i> @Model.Rating / 5.0
+                </span>
+                @if (Model.StockQuantity <= 0)
+                {
+                    <span class="absolute top-4 left-4 bg-red-600 text-white text-xs uppercase tracking-wider font-extrabold px-3 py-1.5 rounded-md shadow-md">
+                        Hết hàng
+                    </span>
+                }
+            </div>
+        </div>
+        
+        <!-- Right: Information Box -->
+        <div class="space-y-8">
+            <div class="space-y-3">
+                <span class="inline-block px-3.5 py-1 rounded-full bg-brand-matcha/10 text-brand-matcha text-[10px] uppercase tracking-[0.2em] font-bold">
+                    @Model.Category?.Name
+                </span>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">@Model.Name</h1>
+                
+                <div class="flex items-center gap-4 text-xs font-semibold text-gray-500">
+                    <span class="flex items-center gap-1"><i class="ph ph-scales"></i> Trọng lượng: @Model.Weight</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-forest/20"></span>
+                    <span class="flex items-center gap-1">
+                        <i class="ph ph-circle-wavy-check"></i> 
+                        Status: <span class="@(Model.StockQuantity > 0 ? "text-green-600" : "text-red-600")">@(Model.StockQuantity > 0 ? "Còn hàng" : "Hết hàng")</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="bg-brand-light p-6 rounded-2xl border border-brand-forest/5 flex items-baseline gap-2">
+                <span class="text-3xl font-mono font-extrabold text-brand-forest">@Model.Price.ToString("N0")</span>
+                <span class="text-sm font-bold text-gray-500">VND</span>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2">
+                <h4 class="text-xs uppercase tracking-widest font-bold text-gray-400">Mô tả sản phẩm</h4>
+                <p class="text-gray-600 leading-relaxed text-sm">@Model.Description</p>
+            </div>
+
+            <!-- Specs Grid -->
+            <div class="border border-brand-forest/5 rounded-2xl overflow-hidden divide-y divide-brand-forest/5 text-sm bg-white">
+                <div class="p-4 flex items-center justify-between">
+                    <span class="text-gray-500 font-semibold">Thành phần chính:</span>
+                    <span class="text-brand-forest font-medium text-right max-w-xs">@Model.Ingredients</span>
+                </div>
+                <div class="p-4 flex items-center justify-between">
+                    <span class="text-gray-500 font-semibold">Quy cách đóng gói:</span>
+                    <span class="text-brand-forest font-medium">Hộp/Túi zip bảo quản kín</span>
+                </div>
+                <div class="p-4 flex items-center justify-between">
+                    <span class="text-gray-500 font-semibold">Hạn sử dụng:</span>
+                    <span class="text-brand-forest font-medium">6 tháng kể từ ngày sản xuất</span>
+                </div>
+            </div>
+
+            <!-- Purchase Actions -->
+            @if (Model.StockQuantity > 0)
+            {
+                <div class="flex flex-wrap items-center gap-4 pt-4">
+                    <!-- Quantity Widget -->
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-full flex items-center justify-center bg-brand-forest text-white hover:bg-brand-matcha active:scale-95 transition-all shadow-sm font-bold text-base leading-none">
+                            -
+                        </button>
+                        <input id="product-qty" type="number" value="1" min="1" max="@Model.StockQuantity" readonly
+                               class="w-12 h-10 text-center font-mono font-bold text-brand-forest bg-white border border-brand-forest/10 rounded-2xl focus:outline-none" />
+                        <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-full flex items-center justify-center bg-brand-forest text-white hover:bg-brand-matcha active:scale-95 transition-all shadow-sm font-bold text-base leading-none">
+                            +
+                        </button>
+                    </div>
+
+                    <!-- Add to Cart -->
+                    <button onclick="addToCart(@Model.Id)" class="btn-premium btn-premium-secondary group flex-1 md:flex-initial shadow-sm">
+                        <span>Thêm Vào Giỏ</span>
+                        <span class="btn-icon-wrapper">
+                            <i class="ph ph-shopping-bag text-lg"></i>
+                        </span>
+                    </button>
+
+                    <!-- Buy Now -->
+                    <button onclick="buyNow(@Model.Id)" class="btn-premium btn-premium-primary group flex-1 md:flex-initial shadow-md">
+                        <span>Mua Ngay</span>
+                        <span class="btn-icon-wrapper">
+                            <i class="ph ph-lightning text-lg"></i>
+                        </span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold flex items-center gap-2">
+                    <i class="ph ph-warning-circle text-lg"></i>
+                    <span>Món ăn này hiện đã hết hàng, vui lòng quay lại sau!</span>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+<!-- Related Recommendations -->
+@if (recommendations.Any())
+{
+    <section class="py-24 bg-brand-light border-t border-brand-forest/5 px-6">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight text-brand-forest text-center">Có Thể Bạn Cũng Thích</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach (var snack in recommendations)
+                {
+                    <div class="outer-shell">
+                        <div class="inner-core">
+                            <div class="space-y-4">
+                                <div class="relative aspect-square rounded-[1.3rem] overflow-hidden bg-brand-light">
+                                    <img src="@snack.ImageUrl" alt="@snack.Name" class="w-full h-full object-cover" />
+                                    @if (snack.StockQuantity <= 0)
+                                    {
+                                        <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-md shadow-md">
+                                            Hết hàng
+                                        </span>
+                                    }
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-xs uppercase font-bold tracking-widest text-brand-matcha">@snack.Category?.Name</p>
+                                    <h3 class="font-bold text-base text-brand-forest line-clamp-1 hover:text-brand-coral transition-colors">
+                                        <a asp-action="Details" asp-route-id="@snack.Id">@snack.Name</a>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-brand-forest/5 mt-4 pt-4">
+                                <span class="font-mono font-bold text-sm text-brand-forest">
+                                    @snack.Price.ToString("N0") đ
+                                </span>
+                                @if (snack.StockQuantity > 0)
+                                {
+                                    <button onclick="addToCart(@snack.Id)" class="w-10 h-10 rounded-full bg-brand-coral hover:bg-brand-coral/90 text-white flex items-center justify-center shadow-sm active:scale-95 transition-all font-bold text-base leading-none">
+                                        +
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button disabled class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shadow-sm cursor-not-allowed font-bold text-sm leading-none" title="Đã hết hàng">
+                                        x
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        function adjustQty(amount) {
+            var input = $('#product-qty');
+            var current = parseInt(input.val());
+            var min = parseInt(input.attr('min'));
+            var max = parseInt(input.attr('max'));
+            
+            var next = current + amount;
+            if (next >= min && next <= max) {
+                input.val(next);
+            }
+        }
+
+        function addToCart(snackId) {
+            var qty = 1;
+            if (snackId === @Model.Id) {
+                qty = parseInt($('#product-qty').val()) || 1;
+            }
+            $.ajax({
+                url: '/Cart/Add',
+                method: 'POST',
+                data: { snackId: snackId, quantity: qty },
+                success: function (response) {
+                    if (response.success) {
+                        updateCartBadge();
+                        showToast('Đã thêm sản phẩm vào giỏ hàng thành công!');
+                    } else {
+                        showToast(response.message || 'Có lỗi xảy ra.', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+        function buyNow(snackId) {
+            var qty = 1;
+            if (snackId === @Model.Id) {
+                qty = parseInt($('#product-qty').val()) || 1;
+            }
+            $.ajax({
+                url: '/Cart/Add',
+                method: 'POST',
+                data: { snackId: snackId, quantity: qty },
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = '/Cart';
+                    } else {
+                        showToast(response.message || 'Có lỗi xảy ra.', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+    </script>
+}

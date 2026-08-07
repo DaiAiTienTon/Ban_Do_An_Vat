@@ -1,0 +1,150 @@
+@model IEnumerable<Ban_Do_An_Vat.Models.Combo>
+@{
+    ViewData["Title"] = "Quản lý Combo";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-extrabold text-brand-forest tracking-tight">Combo Ưu Đãi</h1>
+            <p class="text-sm text-gray-500 mt-1">Quản lý danh sách combo đồ ăn vặt và giá khuyến mãi</p>
+        </div>
+        <a asp-action="Create"
+           class="inline-flex items-center gap-2 bg-brand-coral text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md hover:bg-brand-coral/90 transition-all hover:shadow-lg hover:-translate-y-0.5">
+            <i class="ph ph-plus-circle text-lg"></i>
+            Tạo Combo Mới
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-5 py-3 flex items-center gap-3 text-sm font-medium">
+            <i class="ph ph-check-circle text-green-500 text-lg"></i>
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-brand-forest/5">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Tổng Combo</p>
+            <p class="text-3xl font-extrabold text-brand-forest mt-2">@Model.Count()</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-brand-forest/5">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Đang Bán</p>
+            <p class="text-3xl font-extrabold text-brand-matcha mt-2">@Model.Count(c => c.IsAvailable)</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-brand-forest/5">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Tạm Dừng</p>
+            <p class="text-3xl font-extrabold text-brand-coral mt-2">@Model.Count(c => !c.IsAvailable)</p>
+        </div>
+    </div>
+
+    <!-- Combo Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-brand-forest/5 overflow-hidden">
+        @if (!Model.Any())
+        {
+            <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+                <i class="ph ph-package text-6xl mb-4 text-gray-200"></i>
+                <p class="font-semibold">Chưa có combo nào</p>
+                <p class="text-sm mt-1">Tạo combo đầu tiên để bắt đầu!</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-brand-forest/5 border-b border-brand-forest/10">
+                        <tr>
+                            <th class="text-left px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Combo</th>
+                            <th class="text-left px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Sản phẩm</th>
+                            <th class="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Giá Gốc</th>
+                            <th class="text-right px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Giá KM</th>
+                            <th class="text-center px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Giảm</th>
+                            <th class="text-center px-6 py-4 text-xs font-bold uppercase tracking-widest text-gray-500">Trạng thái</th>
+                            <th class="px-6 py-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-forest/5">
+                        @foreach (var combo in Model)
+                        {
+                            <tr class="hover:bg-brand-forest/2 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        @if (!string.IsNullOrEmpty(combo.ImageUrl))
+                                        {
+                                            <img src="@combo.ImageUrl" alt="@combo.Name"
+                                                 class="w-12 h-12 rounded-xl object-cover shadow-sm border border-brand-forest/10" />
+                                        }
+                                        else
+                                        {
+                                            <div class="w-12 h-12 rounded-xl bg-brand-amber/20 flex items-center justify-center">
+                                                <i class="ph ph-package text-brand-amber text-xl"></i>
+                                            </div>
+                                        }
+                                        <div>
+                                            <p class="font-bold text-brand-forest text-sm">@combo.Name</p>
+                                            <p class="text-xs text-gray-400 mt-0.5 line-clamp-1 max-w-xs">@combo.Description</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach (var item in combo.ComboItems.Take(3))
+                                        {
+                                            <span class="bg-brand-forest/5 text-brand-forest text-xs px-2 py-0.5 rounded-full font-medium">
+                                                @item.Snack?.Name <span class="text-gray-400">x@item.Quantity</span>
+                                            </span>
+                                        }
+                                        @if (combo.ComboItems.Count > 3)
+                                        {
+                                            <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">+@(combo.ComboItems.Count - 3)</span>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-sm text-gray-400 line-through">@combo.OriginalPrice.ToString("N0")đ</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-sm font-bold text-brand-coral">@combo.SalePrice.ToString("N0")đ</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                                        -@combo.DiscountPercent%
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    @if (combo.IsAvailable)
+                                    {
+                                        <span class="bg-green-50 text-green-600 text-xs font-semibold px-3 py-1 rounded-full border border-green-200">Đang bán</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bg-gray-100 text-gray-500 text-xs font-semibold px-3 py-1 rounded-full">Tạm dừng</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2 justify-end">
+                                        <a asp-action="Edit" asp-route-id="@combo.Id"
+                                           class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Sửa">
+                                            <i class="ph ph-pencil-simple text-lg"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@combo.Id" method="post"
+                                              onsubmit="return confirm('Xác nhận xóa combo «@combo.Name»?')">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors" title="Xóa">
+                                                <i class="ph ph-trash text-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

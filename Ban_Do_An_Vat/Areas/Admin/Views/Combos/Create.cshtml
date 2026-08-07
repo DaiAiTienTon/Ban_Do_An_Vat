@@ -1,0 +1,264 @@
+@model Ban_Do_An_Vat.Models.Combo
+@{
+    ViewData["Title"] = "Tạo Combo Mới";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var snacks = ViewBag.Snacks as List<Ban_Do_An_Vat.Models.Snack> ?? new();
+}
+
+<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <a asp-action="Index" class="p-2 rounded-xl hover:bg-brand-forest/5 text-gray-500 transition-colors">
+            <i class="ph ph-arrow-left text-xl"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold text-brand-forest">Tạo Combo Mới</h1>
+            <p class="text-sm text-gray-400 mt-0.5">Thiết lập combo đồ ăn vặt với giá khuyến mãi hấp dẫn</p>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="space-y-6">
+        @Html.AntiForgeryToken()
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Main Info -->
+            <div class="lg:col-span-2 space-y-5">
+                <!-- Basic Info Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-forest/5 space-y-5">
+                    <h3 class="font-bold text-brand-forest flex items-center gap-2">
+                        <i class="ph ph-info text-brand-coral"></i> Thông tin cơ bản
+                    </h3>
+
+                    <div>
+                        <label asp-for="Name" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                        <input asp-for="Name" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral transition-all"
+                               placeholder="Ví dụ: Combo Cay Mê Ly" />
+                        <span asp-validation-for="Name" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                        <textarea asp-for="Description" rows="3"
+                                  class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral transition-all resize-none"
+                                  placeholder="Mô tả combo, điểm nổi bật, phù hợp cho ai..."></textarea>
+                        <span asp-validation-for="Description" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- Pricing Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-forest/5 space-y-5">
+                    <h3 class="font-bold text-brand-forest flex items-center gap-2">
+                        <i class="ph ph-tag text-brand-coral"></i> Giá cả
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label asp-for="OriginalPrice" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                            <div class="relative">
+                                <input asp-for="OriginalPrice" type="number" min="0" step="1000" readonly
+                                       class="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 pr-10 text-sm cursor-not-allowed focus:outline-none transition-all"
+                                       placeholder="Tự động tính" id="originalPrice" />
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">đ</span>
+                            </div>
+                            <p class="text-xs text-blue-500 mt-1 flex items-center gap-1"><i class="ph ph-magic-wand"></i> Tự động tính từ tổng sản phẩm</p>
+                            <span asp-validation-for="OriginalPrice" class="text-xs text-red-500 mt-1 block"></span>
+                        </div>
+                        <div>
+                            <label asp-for="SalePrice" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                            <div class="relative">
+                                <input asp-for="SalePrice" type="number" min="0" step="1000"
+                                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral transition-all"
+                                       placeholder="0" oninput="calcDiscount()" id="salePrice" />
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">đ</span>
+                            </div>
+                            <span asp-validation-for="SalePrice" class="text-xs text-red-500 mt-1 block"></span>
+                        </div>
+                    </div>
+                    <!-- Discount preview -->
+                    <div id="discountPreview" class="hidden bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center gap-3">
+                        <i class="ph ph-lightning text-green-500 text-xl"></i>
+                        <div>
+                            <p class="text-xs text-green-700 font-medium">Khách hàng tiết kiệm được</p>
+                            <p class="text-lg font-extrabold text-green-700" id="discountAmount"></p>
+                        </div>
+                        <span class="ml-auto bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full" id="discountPct"></span>
+                    </div>
+                </div>
+
+                <!-- Snack Items Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-forest/5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-brand-forest flex items-center gap-2">
+                            <i class="ph ph-cookie text-brand-coral"></i> Sản phẩm trong combo
+                        </h3>
+                        <button type="button" onclick="addSnackRow()"
+                                class="inline-flex items-center gap-1.5 bg-brand-forest/5 hover:bg-brand-forest/10 text-brand-forest text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
+                            <i class="ph ph-plus text-sm"></i> Thêm sản phẩm
+                        </button>
+                    </div>
+
+                    <div id="snack-list" class="space-y-3">
+                        <!-- Initial row -->
+                        <div class="snack-row flex items-center gap-3 bg-brand-forest/3 rounded-xl p-3">
+                            <div class="flex-1">
+                                <select name="SnackIds" onchange="recalcOriginalPrice()" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral">
+                                    <option value="0">-- Chọn sản phẩm --</option>
+                                    @foreach (var snack in snacks)
+                                    {
+                                        <option value="@snack.Id">@snack.Name (@snack.Price.ToString("N0")đ)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="w-24">
+                                <input type="number" name="Quantities" min="1" max="99" value="1" oninput="recalcOriginalPrice()"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral" placeholder="SL" />
+                            </div>
+                            <button type="button" onclick="removeRow(this)" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0">
+                                <i class="ph ph-x text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 flex items-center gap-1">
+                        <i class="ph ph-info"></i> Có thể thêm nhiều sản phẩm, mỗi sản phẩm có thể chọn số lượng riêng
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Column: Image & Status -->
+            <div class="space-y-5">
+                <!-- Image Upload Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-forest/5 space-y-4">
+                    <h3 class="font-bold text-brand-forest flex items-center gap-2">
+                        <i class="ph ph-image text-brand-coral"></i> Hình ảnh
+                    </h3>
+                    <div class="relative">
+                        <div id="img-preview" class="w-full h-40 rounded-xl bg-brand-forest/5 border-2 border-dashed border-brand-forest/20 flex flex-col items-center justify-center cursor-pointer hover:border-brand-coral/50 transition-colors overflow-hidden">
+                            <i class="ph ph-image-square text-4xl text-gray-300"></i>
+                            <p class="text-xs text-gray-400 mt-2">Click để chọn ảnh</p>
+                        </div>
+                        <input type="file" name="ImageFile" id="imageInput" accept="image/*"
+                               class="absolute inset-0 opacity-0 cursor-pointer"
+                               onchange="previewImage(this)" />
+                    </div>
+                    <p class="text-xs text-gray-400">JPG, PNG, WEBP. Tối đa 5MB</p>
+                </div>
+
+                <!-- Status Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-brand-forest/5 space-y-4">
+                    <h3 class="font-bold text-brand-forest flex items-center gap-2">
+                        <i class="ph ph-toggle-right text-brand-coral"></i> Trạng thái
+                    </h3>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <div class="relative">
+                            <input asp-for="IsAvailable" type="checkbox" class="sr-only peer" checked />
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-matcha transition-colors"></div>
+                            <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                        <span class="text-sm font-semibold text-gray-700">Đang bán</span>
+                    </label>
+                    <p class="text-xs text-gray-400">Bật/tắt hiển thị combo trên website</p>
+                </div>
+
+                <!-- Save Button -->
+                <button type="submit"
+                        class="w-full bg-brand-coral hover:bg-brand-coral/90 text-white font-bold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <i class="ph ph-floppy-disk text-lg"></i>
+                    Lưu Combo
+                </button>
+                <a asp-action="Index" class="block text-center text-sm text-gray-400 hover:text-gray-600 transition-colors">Hủy bỏ</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Inject snack data as JSON (bao gồm price để tính giá gốc tự động)
+        var snackData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            snacks.Select(s => new { id = s.Id, label = s.Name + " (" + s.Price.ToString("N0") + "đ)", price = (double)s.Price })
+        ));
+
+        function buildSelectHtml(selectedId) {
+            var opts = '<option value="0">-- Chọn sản phẩm --</option>';
+            snackData.forEach(function(s) {
+                var sel = (s.id === selectedId) ? ' selected' : '';
+                opts += '<option value="' + s.id + '"' + sel + '>' + s.label + '</option>';
+            });
+            return opts;
+        }
+
+        function recalcOriginalPrice() {
+            var total = 0;
+            document.querySelectorAll('.snack-row').forEach(function(row) {
+                var snackId = parseInt(row.querySelector('select[name="SnackIds"]').value) || 0;
+                var qty = parseInt(row.querySelector('input[name="Quantities"]').value) || 1;
+                if (snackId > 0) {
+                    var found = snackData.find(function(s) { return s.id === snackId; });
+                    if (found) total += found.price * qty;
+                }
+            });
+            var field = document.getElementById('originalPrice');
+            field.value = total > 0 ? Math.round(total) : '';
+            calcDiscount();
+        }
+
+        function addSnackRow(selectedId, qty) {
+            selectedId = selectedId || 0;
+            qty = qty || 1;
+            var row = document.createElement('div');
+            row.className = 'snack-row flex items-center gap-3 bg-brand-forest/3 rounded-xl p-3';
+            row.innerHTML =
+                '<div class="flex-1">' +
+                    '<select name="SnackIds" onchange="recalcOriginalPrice()" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral">' +
+                        buildSelectHtml(selectedId) +
+                    '</select>' +
+                '</div>' +
+                '<div class="w-24">' +
+                    '<input type="number" name="Quantities" min="1" max="99" value="' + qty + '" oninput="recalcOriginalPrice()" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-coral/30 focus:border-brand-coral" />' +
+                '</div>' +
+                '<button type="button" onclick="removeRow(this)" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0">' +
+                    '<i class="ph ph-x text-sm"></i>' +
+                '</button>';
+            document.getElementById('snack-list').appendChild(row);
+        }
+
+        function removeRow(btn) {
+            var rows = document.querySelectorAll('.snack-row');
+            if (rows.length > 1) {
+                btn.closest('.snack-row').remove();
+            }
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('img-preview');
+                    preview.style.backgroundImage = 'url(' + e.target.result + ')';
+                    preview.style.backgroundSize = 'cover';
+                    preview.style.backgroundPosition = 'center';
+                    preview.innerHTML = '';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function calcDiscount() {
+            var orig = parseFloat(document.getElementById('originalPrice').value) || 0;
+            var sale = parseFloat(document.getElementById('salePrice').value) || 0;
+            var preview = document.getElementById('discountPreview');
+            if (orig > 0 && sale > 0 && orig > sale) {
+                var saved = orig - sale;
+                var pct = Math.round((saved / orig) * 100);
+                document.getElementById('discountAmount').textContent = saved.toLocaleString('vi-VN') + 'đ';
+                document.getElementById('discountPct').textContent = '-' + pct + '%';
+                preview.classList.remove('hidden');
+                preview.classList.add('flex');
+            } else {
+                preview.classList.add('hidden');
+                preview.classList.remove('flex');
+            }
+        }
+    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

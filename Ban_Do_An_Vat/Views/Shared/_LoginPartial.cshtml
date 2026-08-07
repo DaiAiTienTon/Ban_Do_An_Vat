@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Identity
+@using Ban_Do_An_Vat.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="flex items-center gap-4">
+    @if (User.IsInRole("Admin"))
+    {
+        <!-- Admin Quick Access -->
+        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-forest text-white hover:bg-brand-matcha transition-all duration-300 text-xs font-bold shadow-sm">
+            <i class="ph ph-shield-check-bold text-sm"></i>
+            <span>Admin Portal</span>
+        </a>
+    }
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="flex items-center gap-4">
+        <a class="text-sm font-semibold text-brand-forest hover:text-brand-coral transition-colors" asp-area="" asp-controller="Orders" asp-action="Index">Đơn Hàng Của Tôi</a>
+        <a class="text-sm font-semibold text-brand-forest hover:text-brand-coral transition-colors" asp-area="" asp-controller="Account" asp-action="Profile" title="Quản lý tài khoản">
+            Hi, @(User.Identity?.Name?.Split('@')[0] ?? "Thành viên")
+        </a>
+        <form class="inline" asp-area="" asp-controller="Account" asp-action="Logout">
+            <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-700 transition-colors bg-transparent border-none p-0 cursor-pointer">
+                Đăng Xuất
+            </button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="flex items-center gap-4">
+        <a class="text-sm font-semibold text-brand-forest hover:text-brand-coral transition-colors" asp-area="" asp-controller="Account" asp-action="Login">Đăng Nhập</a>
+        <a class="hidden lg:inline-block text-xs font-bold text-white bg-brand-coral px-4 py-2 rounded-full hover:bg-brand-coral/90 transition-colors shadow-sm" asp-area="" asp-controller="Account" asp-action="Register">Đăng Ký</a>
+    </div>
+}
+</div>

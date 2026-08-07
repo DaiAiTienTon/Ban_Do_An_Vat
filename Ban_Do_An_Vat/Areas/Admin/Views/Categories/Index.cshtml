@@ -1,0 +1,48 @@
+@model IEnumerable<Ban_Do_An_Vat.Models.Category>
+@{
+    ViewData["Title"] = "Quản lý Danh Mục";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-brand-forest">Danh Mục Sản Phẩm</h1>
+        <p class="text-sm text-gray-500">Quản lý các loại mặt hàng trên hệ thống.</p>
+    </div>
+    <a asp-action="Create" class="inline-flex items-center gap-2 bg-brand-coral text-white text-xs font-bold px-4 py-2.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-sm">
+        <i class="ph ph-plus-bold"></i>
+        <span>Thêm Danh Mục Mới</span>
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-brand-forest/5 overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-brand-bone text-brand-forest text-sm uppercase tracking-wider">
+            <tr>
+                <th class="p-4 font-bold border-b border-brand-forest/5">ID</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Tên Danh Mục</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Mô Tả</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5 text-right">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-forest/5">
+            @foreach (var item in Model)
+            {
+                <tr class="hover:bg-brand-bone/30 transition-colors">
+                    <td class="p-4 font-mono font-semibold">#@item.Id</td>
+                    <td class="p-4 font-bold text-brand-forest">@item.Name</td>
+                    <td class="p-4 text-sm text-gray-600 truncate max-w-xs">@item.Description</td>
+                    <td class="p-4 text-right">
+                        <div class="flex gap-2 justify-end">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="px-3 py-1.5 rounded-full bg-brand-forest text-white hover:bg-brand-matcha text-xs font-bold transition-all shadow-sm">
+                                Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="px-3 py-1.5 rounded-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all shadow-sm">
+                                Xóa
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

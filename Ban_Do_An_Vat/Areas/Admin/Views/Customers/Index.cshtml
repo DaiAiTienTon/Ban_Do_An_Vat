@@ -1,0 +1,39 @@
+@model IEnumerable<ApplicationUser>
+@{
+    ViewData["Title"] = "Quản lý Khách Hàng";
+}
+
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-brand-forest">Danh Sách Khách Hàng</h1>
+        <p class="text-sm text-gray-500">Quản lý tài khoản đăng nhập trên hệ thống.</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-brand-forest/5 overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-brand-bone text-brand-forest text-sm uppercase tracking-wider">
+            <tr>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Họ Tên</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Email</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Số Điện Thoại</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Địa Chỉ</th>
+                <th class="p-4 font-bold border-b border-brand-forest/5">Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-forest/5">
+            @foreach (var user in Model)
+            {
+                <tr class="hover:bg-brand-bone/30 transition-colors">
+                    <td class="p-4 font-bold text-brand-forest">@user.FullName</td>
+                    <td class="p-4 text-sm">@user.Email</td>
+                    <td class="p-4 text-sm font-semibold">@user.PhoneNumber</td>
+                    <td class="p-4 text-sm text-gray-500 max-w-xs truncate">@user.Address</td>
+                    <td class="p-4">
+                        <a asp-action="Details" asp-route-id="@user.Id" class="text-brand-matcha hover:text-brand-coral font-semibold text-sm">Xem chi tiết</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

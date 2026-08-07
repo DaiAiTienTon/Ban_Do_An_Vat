@@ -1,0 +1,66 @@
+@model Ban_Do_An_Vat.Controllers.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng Ký";
+}
+
+<div class="max-w-md mx-auto my-16 px-6">
+    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-brand-forest/5">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-brand-forest">Đăng Ký</h1>
+            <p class="text-sm text-gray-500 mt-2">Tạo tài khoản Munchies của bạn hôm nay.</p>
+        </div>
+
+        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="space-y-5">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm font-semibold mb-4"></div>
+
+            <div>
+                <label asp-for="FullName" class="block text-sm font-semibold text-brand-forest mb-1.5">Họ và tên</label>
+                <input asp-for="FullName" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="Nguyễn Văn A" />
+                <span asp-validation-for="FullName" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="Email" class="block text-sm font-semibold text-brand-forest mb-1.5">Email</label>
+                <input asp-for="Email" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="nhap@email.com" />
+                <span asp-validation-for="Email" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="PhoneNumber" class="block text-sm font-semibold text-brand-forest mb-1.5">Số điện thoại</label>
+                <input asp-for="PhoneNumber" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="09xxxxxxx" />
+                <span asp-validation-for="PhoneNumber" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="Address" class="block text-sm font-semibold text-brand-forest mb-1.5">Địa chỉ giao hàng mặc định</label>
+                <input asp-for="Address" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="Số nhà, Tên đường, Quận, TP" />
+                <span asp-validation-for="Address" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password" class="block text-sm font-semibold text-brand-forest mb-1.5">Mật khẩu</label>
+                <input asp-for="Password" type="password" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="ConfirmPassword" class="block text-sm font-semibold text-brand-forest mb-1.5">Xác nhận mật khẩu</label>
+                <input asp-for="ConfirmPassword" type="password" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="••••••••" />
+                <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-coral text-white font-bold py-3.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20 mt-2">
+                Đăng Ký Tài Khoản
+            </button>
+        </form>
+
+        <div class="mt-8 text-center text-sm text-gray-500 border-t border-brand-forest/5 pt-6">
+            Đã có tài khoản? 
+            <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-brand-matcha hover:text-brand-coral font-bold transition-colors">Đăng nhập</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --brand-forest: #0F2C1F;
+    --brand-matcha: #2D6A4F;
+    --brand-coral: #EA580C;
+    --brand-amber: #F7A072;
+    --brand-bone: #FAF9F6;
+    --brand-dark: #0F172A;
+    --brand-light: #F8FAFC;
+    
+    --bezier-premium: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+* {
+    selection-background-color: var(--brand-coral);
+    selection-color: white;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--brand-bone);
+    color: var(--brand-dark);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(15, 44, 31, 0.15);
+    border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 44, 31, 0.3);
+}
+
+/* Grain Noise Overlay */
+.grain-noise {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Double Bezel System (Nested Enclosure) */
+.outer-shell {
+    background: rgba(15, 44, 31, 0.03);
+    border: 1px solid rgba(15, 44, 31, 0.05);
+    padding: 6px;
+    border-radius: 2rem;
+    box-shadow: 0 10px 40px -10px rgba(15, 44, 31, 0.04);
+    transition: all 0.7s var(--bezier-premium);
+}
+
+.outer-shell:hover {
+    background: rgba(15, 44, 31, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px -10px rgba(15, 44, 31, 0.08);
+}
+
+.inner-core {
+    background: #FFFFFF;
+    border-radius: calc(2rem - 6px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 1px 3px rgba(0, 0, 0, 0.02);
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Tactile Pill Buttons */
+.btn-premium {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: -0.01em;
+    padding: 0.75rem 1.5rem;
+    border-radius: 99px;
+    transition: all 0.5s var(--bezier-premium);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-premium-primary {
+    background-color: var(--brand-coral);
+    color: #FFFFFF;
+}
+
+.btn-premium-primary:hover {
+    background-color: #D97706; /* Slightly darker coral/amber */
+    transform: scale(1.02);
+}
+
+.btn-premium-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-premium-secondary {
+    background-color: rgba(15, 44, 31, 0.05);
+    color: var(--brand-forest);
+    border: 1px solid rgba(15, 44, 31, 0.08);
+}
+
+.btn-premium-secondary:hover {
+    background-color: rgba(15, 44, 31, 0.08);
+    transform: scale(1.02);
+}
+
+.btn-premium-secondary:active {
+    transform: scale(0.98);
+}
+
+/* Button-in-Button Icon Container */
+.btn-icon-wrapper {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s var(--bezier-premium);
+}
+
+.btn-premium:hover .btn-icon-wrapper {
+    transform: rotate(45deg) scale(1.1);
+}
+
+/* Keyframes & Scroll reveals */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.98);
+        filter: blur(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+.animate-fade-up {
+    animation: fadeUp 1s var(--bezier-premium) forwards;
+}
+
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+
+/* Bento specific classes */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+/* Glass effect */
+.glass-nav {
+    backdrop-filter: blur(20px);
+    background-color: rgba(253, 251, 247, 0.8);
+    border-bottom: 1px solid rgba(15, 44, 31, 0.05);
+}
+
+/* Custom visual badges */
+.badge-mono {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+}

@@ -1,0 +1,278 @@
+@model Ban_Do_An_Vat.Controllers.SnacksController.CatalogViewModel
+@{
+    ViewData["Title"] = "Cửa Hàng";
+}
+
+<!-- Shop Main Wrapper -->
+<section class="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-up">
+    <!-- Breadcrumbs / Page Title -->
+    <div class="mb-10 text-left">
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Thực Đơn Ăn Vặt</h1>
+        <p class="text-gray-500 mt-2">Tuyển chọn các món ăn vặt hảo hạng, thơm ngon tự nhiên.</p>
+    </div>
+
+    <!-- Shop Content Grid -->
+    <div id="shop-container" class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- Sidebar Filters -->
+        <aside class="space-y-8">
+            <!-- Search Widget -->
+            <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-brand-forest">Tìm kiếm</h4>
+                <form method="get" asp-action="Index" class="relative">
+                    <input type="hidden" name="category" value="@Model.SelectedCategoryId" />
+                    <input type="hidden" name="sortOrder" value="@Model.SortOrder" />
+                    <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+                    <input type="text" name="searchString" value="@Model.SearchString" placeholder="Nhập tên món ăn..." 
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                    <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-brand-forest hover:text-brand-coral transition-colors">
+                        <i class="ph ph-magnifying-glass text-xl"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Categories Widget -->
+            <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-brand-forest">Danh mục sản phẩm</h4>
+                <div class="space-y-1">
+                    <a asp-action="Index" asp-route-searchString="@Model.SearchString" asp-route-sortOrder="@Model.SortOrder" asp-route-maxPrice="@Model.MaxPrice"
+                       class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-colors @(Model.SelectedCategoryId == null ? "bg-brand-coral text-white" : "text-brand-forest hover:bg-brand-forest/5")">
+                        <span>Tất cả</span>
+                        <i class="ph ph-caret-right"></i>
+                    </a>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <a asp-action="Index" asp-route-category="@cat.Id" asp-route-searchString="@Model.SearchString" asp-route-sortOrder="@Model.SortOrder" asp-route-maxPrice="@Model.MaxPrice"
+                           class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-semibold transition-colors @(Model.SelectedCategoryId == cat.Id ? "bg-brand-coral text-white" : "text-brand-forest hover:bg-brand-forest/5")">
+                            <span>@cat.Name</span>
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Price Range Filter Widget -->
+            <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-brand-forest">Khoảng giá (VND)</h4>
+                <form method="get" asp-action="Index" class="space-y-4">
+                    <input type="hidden" name="category" value="@Model.SelectedCategoryId" />
+                    <input type="hidden" name="searchString" value="@Model.SearchString" />
+                    <input type="hidden" name="sortOrder" value="@Model.SortOrder" />
+                    
+                    <div class="flex items-center justify-between gap-4">
+                        <span class="text-xs font-semibold text-gray-500">Tối đa:</span>
+                        <span id="price-slider-value" class="font-mono font-bold text-brand-coral text-sm">@(Model.MaxPrice?.ToString("N0") ?? "150,000") đ</span>
+                    </div>
+                    
+                    <input type="range" name="maxPrice" min="20000" max="150000" step="5000" value="@(Model.MaxPrice ?? 150000)" 
+                           oninput="updatePriceSlider(this.value)"
+                           class="w-full accent-brand-coral h-1.5 bg-brand-light rounded-lg cursor-pointer" />
+                    
+                    <button type="submit" class="w-full btn-premium btn-premium-primary text-xs py-2 shadow-sm">
+                        <span>Lọc Giá</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Reset Filters -->
+            @if (Model.SelectedCategoryId != null || !string.IsNullOrEmpty(Model.SearchString) || Model.MaxPrice != null)
+            {
+                <a asp-action="Index" class="w-full btn-premium btn-premium-secondary text-xs py-2 text-center flex items-center justify-center gap-1.5">
+                    <i class="ph ph-arrow-counter-clockwise"></i>
+                    <span>Xóa bộ lọc</span>
+                </a>
+            }
+        </aside>
+
+        <!-- Main Product Section -->
+        <main class="lg:col-span-3 space-y-8">
+            <!-- Results Info and Sorting -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white border border-brand-forest/5 rounded-2xl">
+                <p class="text-sm text-gray-500 font-semibold">
+                    Hiển thị <span class="text-brand-forest font-bold">@Model.Snacks.Count()</span> sản phẩm
+                </p>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-brand-forest/60 uppercase">Sắp xếp:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <a asp-action="Index" asp-route-category="@Model.SelectedCategoryId" asp-route-searchString="@Model.SearchString" asp-route-maxPrice="@Model.MaxPrice" asp-route-sortOrder="@ViewData["PriceSortParm"]"
+                           class="px-3.5 py-1.5 rounded-full text-xs font-semibold border border-brand-forest/5 transition-all @(Model.SortOrder?.Contains("price") == true ? "bg-brand-forest text-white" : "bg-brand-light text-brand-forest hover:bg-brand-forest/5")">
+                            Giá @(Model.SortOrder == "price_asc" ? "▲" : Model.SortOrder == "price_desc" ? "▼" : "")
+                        </a>
+                        <a asp-action="Index" asp-route-category="@Model.SelectedCategoryId" asp-route-searchString="@Model.SearchString" asp-route-maxPrice="@Model.MaxPrice" asp-route-sortOrder="rating_desc"
+                           class="px-3.5 py-1.5 rounded-full text-xs font-semibold border border-brand-forest/5 transition-all @(Model.SortOrder == "rating_desc" ? "bg-brand-forest text-white" : "bg-brand-light text-brand-forest hover:bg-brand-forest/5")">
+                            Đánh giá cao
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            @if (!Model.Snacks.Any())
+            {
+                <!-- Empty State -->
+                <div class="p-16 text-center bg-white border border-brand-forest/5 rounded-[2.5rem] flex flex-col items-center justify-center space-y-4">
+                    <div class="w-16 h-16 rounded-full bg-brand-coral/10 text-brand-coral flex items-center justify-center text-3xl">
+                        <i class="ph ph-cookie-light"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-forest">Không tìm thấy món ăn phù hợp</h3>
+                    <p class="text-gray-500 max-w-sm">Hãy thử thay đổi điều kiện tìm kiếm hoặc xóa bộ lọc để xem lại toàn bộ thực đơn của cửa hàng.</p>
+                    <a asp-action="Index" class="btn-premium btn-premium-primary text-xs py-2 shadow-sm">
+                        <span>Xem toàn bộ thực đơn</span>
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach (var snack in Model.Snacks)
+                    {
+                        <div class="outer-shell animate-fade-up">
+                            <div class="inner-core">
+                                <div class="space-y-4">
+                                    <!-- Image Container -->
+                                    <div class="relative aspect-square rounded-[1.3rem] overflow-hidden bg-brand-light group-item">
+                                        <img src="@snack.ImageUrl" alt="@snack.Name" class="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-105" />
+                                        <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-brand-forest text-xs font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                                            <i class="ph-fill ph-star text-yellow-500"></i> @snack.Rating
+                                        </span>
+                                        @if (snack.StockQuantity <= 0)
+                                        {
+                                            <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-md shadow-md">
+                                                Hết hàng
+                                            </span>
+                                        }
+                                    </div>
+                                    
+                                    <!-- Product Info -->
+                                    <div class="space-y-2">
+                                        <p class="text-xs uppercase font-bold tracking-widest text-brand-matcha">@snack.Category?.Name</p>
+                                        <h3 class="font-bold text-lg text-brand-forest leading-snug line-clamp-1 hover:text-brand-coral transition-colors">
+                                            <a asp-action="Details" asp-route-id="@snack.Id">@snack.Name</a>
+                                        </h3>
+                                        <p class="text-xs text-gray-400 line-clamp-2">@snack.Description</p>
+                                    </div>
+                                </div>
+
+                                <!-- Action and Price -->
+                                <div class="flex items-center justify-between border-t border-brand-forest/5 mt-4 pt-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] uppercase tracking-wider text-gray-400 font-bold">@snack.Weight</span>
+                                        <span class="font-mono font-bold text-base text-brand-forest">
+                                            @snack.Price.ToString("N0") <span class="text-xs font-sans font-normal">đ</span>
+                                        </span>
+                                    </div>
+                                    @if (snack.StockQuantity > 0)
+                                    {
+                                        <button onclick="addToCart(@snack.Id)" class="w-10 h-10 rounded-full bg-brand-coral hover:bg-brand-coral/90 text-white flex items-center justify-center shadow-sm active:scale-95 transition-all font-bold text-base leading-none">
+                                            +
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button disabled class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shadow-sm cursor-not-allowed font-bold text-sm leading-none" title="Đã hết hàng">
+                                            x
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </main>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function updatePriceSlider(val) {
+            var formatted = Number(val).toLocaleString('vi-VN');
+            $('#price-slider-value').text(formatted + ' đ');
+        }
+
+        function addToCart(snackId) {
+            $.ajax({
+                url: '/Cart/Add',
+                method: 'POST',
+                data: { snackId: snackId, quantity: 1 },
+                success: function (response) {
+                    if (response.success) {
+                        updateCartBadge();
+                        showToast('Đã thêm sản phẩm vào giỏ hàng thành công!');
+                    } else {
+                        showToast(response.message || 'Có lỗi xảy ra.', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+
+        // AJAX Shop Filter/Search/Sort Handling
+        $(document).on('submit', '#shop-container form', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action') || window.location.pathname;
+            var params = form.serialize();
+            var targetUrl = url + '?' + params;
+            loadShopContent(targetUrl);
+        });
+
+        $(document).on('click', '#shop-container a', function(e) {
+            var link = $(this);
+            var href = link.attr('href');
+            if (href) {
+                // Intercept only shop filter/sort URLs
+                if (href.indexOf('category=') > -1 || 
+                    href.indexOf('sortOrder=') > -1 || 
+                    href.indexOf('searchString=') > -1 || 
+                    href.indexOf('maxPrice=') > -1 || 
+                    href === '/Snacks' || 
+                    href === '/Snacks/Index' || 
+                    href.endsWith('/Snacks') || 
+                    href.endsWith('/Snacks/Index')) {
+                    
+                    e.preventDefault();
+                    loadShopContent(href);
+                }
+            }
+        });
+
+        // Trigger filter automatically when releasing price slider
+        $(document).on('change', '#shop-container input[name="maxPrice"]', function() {
+            $(this).closest('form').submit();
+        });
+
+        function loadShopContent(targetUrl) {
+            $('#shop-container').css('opacity', '0.5');
+            
+            $.ajax({
+                url: targetUrl,
+                type: 'GET',
+                success: function(response) {
+                    var newContent = $(response).find('#shop-container').html();
+                    $('#shop-container').html(newContent);
+                    $('#shop-container').animate({ opacity: 1 }, 150);
+                    
+                    // Push state to browser history
+                    window.history.pushState({ path: targetUrl }, '', targetUrl);
+                },
+                error: function() {
+                    showToast('Không thể kết nối tới máy chủ để tải dữ liệu.', 'error');
+                    $('#shop-container').css('opacity', '1');
+                }
+            });
+        }
+
+        // Handle browser Back/Forward navigation
+        window.onpopstate = function(e) {
+            if (e.state && e.state.path) {
+                loadShopContent(e.state.path);
+            } else {
+                location.reload();
+            }
+        };
+    </script>
+}

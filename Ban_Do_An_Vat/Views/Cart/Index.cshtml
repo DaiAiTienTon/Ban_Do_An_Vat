@@ -1,0 +1,321 @@
+@model List<Ban_Do_An_Vat.Models.CartItem>
+@{
+    ViewData["Title"] = "Giỏ Hàng";
+    decimal cartTotal = ViewBag.CartTotal is decimal ? (decimal)ViewBag.CartTotal : 0;
+    decimal shippingFee = cartTotal > 150000 ? 0 : (cartTotal > 0 ? 20000 : 0);
+    decimal grandTotal = cartTotal + shippingFee;
+}
+
+<section class="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-up">
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Giỏ Hàng Của Bạn</h1>
+        <p class="text-gray-500 mt-2">Xem lại các món ăn vặt đã chọn trước khi thanh toán.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <!-- Empty State -->
+        <div class="p-16 text-center bg-white border border-brand-forest/5 rounded-[2.5rem] flex flex-col items-center justify-center space-y-4 max-w-2xl mx-auto shadow-sm">
+            <div class="w-16 h-16 rounded-full bg-brand-forest/5 text-brand-forest flex items-center justify-center text-3xl">
+                <i class="ph-light ph-shopping-bag"></i>
+            </div>
+            <h3 class="text-xl font-bold text-brand-forest">Giỏ hàng của bạn đang trống</h3>
+            <p class="text-gray-500">Có vẻ như bạn chưa chọn món ăn vặt nào. Hãy khám phá thực đơn thơm ngon của chúng tôi ngay nhé!</p>
+            <a asp-controller="Snacks" asp-action="Index" class="btn-premium btn-premium-primary text-xs py-2 shadow-sm">
+                <span>Quay Lại Cửa Hàng</span>
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Cart Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- Left Side: List of Items -->
+            <div class="lg:col-span-2 space-y-4">
+                @foreach (var item in Model)
+                {
+                    <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-300 hover:shadow-md">
+                        <!-- Product Thumbnail & Details -->
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <div class="w-20 h-20 rounded-2xl overflow-hidden bg-brand-light flex-shrink-0">
+                                <img src="@item.ImageUrl" alt="@item.Name" class="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-brand-forest hover:text-brand-coral transition-colors text-base">
+                                    @if (item.IsCombo)
+                                    {
+                                        <span class="inline-block bg-brand-coral text-white text-[10px] font-extrabold px-2 py-0.5 rounded-lg mr-1.5 align-middle">COMBO</span>
+                                        <a asp-controller="Combos" asp-action="Details" asp-route-id="@item.ComboId" class="align-middle">@item.Name</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Snacks" asp-action="Details" asp-route-id="@item.SnackId">@item.Name</a>
+                                    }
+                                </h3>
+                                @if (item.IsCombo)
+                                {
+                                    <p class="text-xs text-gray-400 mt-0.5">@item.ComboLabel</p>
+                                }
+                                else
+                                {
+                                    <p class="text-xs text-gray-400 mt-0.5">Trọng lượng: @item.Weight</p>
+                                }
+                                <span class="font-mono text-xs font-semibold text-brand-matcha mt-1 block">
+                                    @item.Price.ToString("N0") đ
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Quantity and Total Price actions -->
+                        <div class="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto border-t sm:border-t-0 border-brand-forest/5 pt-4 sm:pt-0">
+                            <!-- Qty Selector -->
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="updateQty(@item.SnackId, -1, @item.ComboId)" class="w-8 h-8 rounded-full flex items-center justify-center bg-brand-forest text-white hover:bg-brand-matcha active:scale-95 transition-all shadow-sm font-bold text-sm leading-none">
+                                    -
+                                </button>
+                                <input id="qty-@(item.IsCombo ? "c-" + item.ComboId : item.SnackId)" type="number" value="@item.Quantity" readonly
+                                       class="w-10 h-8 text-center font-mono font-bold text-brand-forest bg-white border border-brand-forest/10 rounded-xl focus:outline-none align-content-center"/>
+                                <button type="button" onclick="updateQty(@item.SnackId, 1, @item.ComboId)" class="w-8 h-8 rounded-full flex items-center justify-center bg-brand-forest text-white hover:bg-brand-matcha active:scale-95 transition-all shadow-sm font-bold text-sm leading-none">
+                                    +
+                                </button>
+                            </div>
+
+                            <!-- Total price of item -->
+                            <div class="text-right w-24">
+                                <span id="subtotal-@(item.IsCombo ? "c-" + item.ComboId : item.SnackId)" class="font-mono font-bold text-brand-forest text-sm sm:text-base block">
+                                    @item.TotalPrice.ToString("N0") đ
+                                </span>
+                            </div>
+
+                            <!-- Delete Button -->
+                            <form asp-action="Remove" method="post" class="ml-2">
+                                <input type="hidden" name="snackId" value="@item.SnackId" />
+                                <input type="hidden" name="comboId" value="@item.ComboId" />
+                                <button type="submit" title="Xóa món này" class="w-8 h-8 rounded-full flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                    <i class="ph-bold ph-x text-sm"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Right Side: Order Summary (col-span-1) -->
+            <div class="space-y-6">
+                <!-- Summary Card -->
+                <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-6">
+                    <h3 class="text-lg font-bold text-brand-forest border-b border-brand-forest/5 pb-4">Tóm tắt đơn hàng</h3>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between text-gray-500">
+                            <span>Tạm tính:</span>
+                            <span id="cart-total" class="font-mono font-bold text-brand-forest">@cartTotal.ToString("N0") đ</span>
+                        </div>
+                        <div class="flex justify-between text-gray-500">
+                            <span>Phí vận chuyển:</span>
+                            <span id="shipping-fee" class="font-mono font-bold text-brand-forest">@(shippingFee == 0 ? "Miễn phí" : shippingFee.ToString("N0") + " đ")</span>
+                        </div>
+                        <div id="free-ship-note" class="text-[10px] text-brand-matcha font-medium @(shippingFee == 0 ? "hidden" : "")">
+                            Mua thêm <span id="free-ship-remaining">@((150000 - cartTotal).ToString("N0"))</span> đ để được Miễn phí vận chuyển!
+                        </div>
+                        
+                        <!-- Discount Row -->
+                        @{
+                            decimal discount = ViewBag.Discount is decimal ? (decimal)ViewBag.Discount : 0;
+                            var discountHidden = discount == 0 ? "hidden" : "";
+                        }
+                        <div id="discount-row" class="flex justify-between text-brand-coral @discountHidden">
+                            <span>Giảm giá:</span>
+                            <span id="discount-amount" class="font-mono font-bold">-@discount.ToString("N0") đ</span>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-brand-forest/5 pt-4 flex justify-between items-baseline">
+                        <span class="font-bold text-brand-forest">Tổng cộng:</span>
+                        <span id="grand-total" class="text-2xl font-mono font-extrabold text-brand-coral">@(((decimal)ViewBag.GrandTotal).ToString("N0")) đ</span>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <a asp-action="Checkout" class="w-full btn-premium btn-premium-primary group shadow-md py-3 text-center flex items-center justify-center">
+                        <span>Tiến Hành Thanh Toán</span>
+                        <span class="btn-icon-wrapper">
+                            <i class="ph-bold ph-arrow-right"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Promo Coupon Widget -->
+                <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-brand-forest">Mã giảm giá</h4>
+                    
+                    @{
+                        var appliedCode = ViewBag.AppliedCouponCode as string;
+                        var hasCoupon = !string.IsNullOrEmpty(appliedCode);
+                    }
+                    
+                    <!-- Coupon Input Form -->
+                    <div id="coupon-input-container" class="flex gap-2 @(hasCoupon ? "hidden" : "")">
+                        <input type="text" id="coupon-input" placeholder="Nhập mã..." class="bg-brand-light border border-brand-forest/5 rounded-full px-4 py-2.5 text-xs focus:outline-none focus:border-brand-coral text-brand-forest w-full uppercase font-mono" />
+                        <button type="button" onclick="applyCoupon()" class="btn-premium btn-premium-secondary text-xs px-4 py-2.5 shadow-sm">
+                            Áp dụng
+                        </button>
+                    </div>
+
+                    <!-- Applied Coupon Badge -->
+                    <div id="applied-coupon-container" class="flex items-center justify-between bg-green-50 border border-green-200 rounded-2xl p-3 @(hasCoupon ? "" : "hidden")">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-ticket-bold text-green-600 text-lg"></i>
+                            <div>
+                                <div class="text-[10px] text-gray-400 font-bold uppercase">Đang áp dụng</div>
+                                <div id="applied-coupon-code" class="font-mono font-bold text-green-700 text-xs">@appliedCode</div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="removeCoupon()" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+</section>
+
+@section Scripts {
+    <script>
+        function formatCurrency(val) {
+            return new Intl.NumberFormat('vi-VN').format(val);
+        }
+
+        function updateQty(snackId, amount, comboId) {
+            comboId = comboId || 0;
+            var inputId = comboId > 0 ? '#qty-c-' + comboId : '#qty-' + snackId;
+            var subtotalId = comboId > 0 ? '#subtotal-c-' + comboId : '#subtotal-' + snackId;
+            var input = $(inputId);
+            var current = parseInt(input.val());
+            var next = current + amount;
+            
+            if (next <= 0) return; // Prevent less than 1 quantity
+            
+            $.ajax({
+                url: '/Cart/UpdateQuantity',
+                method: 'POST',
+                data: { snackId: snackId, quantity: next, comboId: comboId },
+                success: function (response) {
+                    if (response.success) {
+                        // Cập nhật giá trị input và tiền mặt hàng
+                        input.val(next);
+                        $(subtotalId).text(formatCurrency(response.itemSubtotal) + ' đ');
+                        
+                        // Cập nhật các thông số tóm tắt đơn hàng
+                        $('#cart-total').text(formatCurrency(response.cartTotal) + ' đ');
+                        
+                        // Cập nhật phí ship
+                        if (response.shippingFee === 0) {
+                            $('#shipping-fee').text('Miễn phí');
+                            $('#free-ship-note').addClass('hidden');
+                        } else {
+                            $('#shipping-fee').text(formatCurrency(response.shippingFee) + ' đ');
+                            $('#free-ship-note').removeClass('hidden');
+                            var remaining = 150000 - response.cartTotal;
+                            $('#free-ship-remaining').text(formatCurrency(remaining));
+                        }
+                        
+                        // Cập nhật giảm giá nếu có
+                        if (response.discount > 0) {
+                            $('#discount-row').removeClass('hidden');
+                            $('#discount-amount').text('-' + formatCurrency(response.discount) + ' đ');
+                        } else {
+                            $('#discount-row').addClass('hidden');
+                            if (!response.couponCode) {
+                                // Nếu có coupon nhưng tiền giỏ hàng giảm dưới mức min, coupon tự động bị gỡ bỏ
+                                $('#coupon-input').val('');
+                                $('#coupon-input-container').removeClass('hidden');
+                                $('#applied-coupon-container').addClass('hidden');
+                            }
+                        }
+                        
+                        // Tổng cộng
+                        $('#grand-total').text(formatCurrency(response.grandTotal) + ' đ');
+                        
+                        // Cập nhật nhãn số lượng trên Navbar
+                        if (response.cartCount > 0) {
+                            $('#cart-badge-count').text(response.cartCount).removeClass('hidden');
+                        } else {
+                            $('#cart-badge-count').addClass('hidden');
+                        }
+                    } else {
+                        showToast(response.message || 'Cập nhật giỏ hàng thất bại!', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối.', 'error');
+                }
+            });
+        }
+
+
+        function applyCoupon() {
+            var code = $('#coupon-input').val();
+            if (!code) {
+                showToast('Vui lòng nhập mã giảm giá.', 'error');
+                return;
+            }
+            $.ajax({
+                url: '/Cart/ApplyCoupon',
+                method: 'POST',
+                data: { couponCode: code },
+                success: function(response) {
+                    if (response.success) {
+                        showToast(response.message, 'success');
+                        
+                        // Ẩn input form, hiển thị badge đang áp dụng
+                        $('#coupon-input-container').addClass('hidden');
+                        $('#applied-coupon-container').removeClass('hidden');
+                        $('#applied-coupon-code').text(response.couponCode);
+                        
+                        // Hiển thị và cập nhật dòng giảm giá
+                        $('#discount-row').removeClass('hidden');
+                        $('#discount-amount').text('-' + formatCurrency(response.discount) + ' đ');
+                        
+                        // Cập nhật tổng tiền thanh toán mới
+                        $('#grand-total').text(formatCurrency(response.grandTotal) + ' đ');
+                    } else {
+                        showToast(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối khi áp dụng mã.', 'error');
+                }
+            });
+        }
+
+        function removeCoupon() {
+            $.ajax({
+                url: '/Cart/RemoveCoupon',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        showToast(response.message, 'success');
+                        
+                        // Hiển thị lại input, ẩn badge
+                        $('#coupon-input').val('');
+                        $('#coupon-input-container').removeClass('hidden');
+                        $('#applied-coupon-container').addClass('hidden');
+                        
+                        // Ẩn dòng giảm giá
+                        $('#discount-row').addClass('hidden');
+                        $('#discount-amount').text('0 đ');
+                        
+                        // Khôi phục tổng tiền thanh toán
+                        $('#grand-total').text(formatCurrency(response.grandTotal) + ' đ');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi kết nối khi gỡ mã.', 'error');
+                }
+            });
+        }
+    </script>
+}

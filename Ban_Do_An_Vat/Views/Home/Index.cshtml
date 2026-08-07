@@ -1,0 +1,315 @@
+@model Ban_Do_An_Vat.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Trang Chủ";
+}
+
+<!-- Hero Section -->
+<section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden px-6 py-12 md:py-24 bg-gradient-to-br from-brand-bone via-brand-light to-white">
+    <!-- Abstract Ambient Orb Backgrounds -->
+    <div class="absolute top-1/4 left-1/4 w-[300px] h-[300px] rounded-full bg-brand-amber/10 blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-matcha/5 blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 w-full animate-fade-up">
+        <!-- Text Column -->
+        <div class="space-y-6 text-left">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-forest/5 text-brand-forest text-[11px] uppercase tracking-[0.2em] font-bold">
+                <i class="ph-fill ph-sparkle text-brand-coral"></i>
+                <span>Ăn vặt lành mạnh - Trọn vị Việt</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tighter leading-tight text-brand-forest">
+                Thỏa Mãn Cơn Thèm<br/>
+                <span class="text-brand-coral">Ăn Vặt Đậm Đà</span>
+            </h1>
+            
+            <p class="text-base text-gray-600 leading-relaxed max-w-[45ch]">
+                Khám phá bộ sưu tập bánh tráng trộn Sài Gòn cay nồng, khô gà lá chanh giòn rụm và hạt điều sấy tự nhiên béo ngậy. Giao nhanh 2h.
+            </p>
+            
+            <!-- CTAs -->
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a asp-controller="Snacks" asp-action="Index" class="btn-premium btn-premium-primary group">
+                    <span>Mua Ngay</span>
+                    <span class="btn-icon-wrapper">
+                        <i class="ph-bold ph-arrow-up-right"></i>
+                    </span>
+                </a>
+                <a href="#categories" class="btn-premium btn-premium-secondary">
+                    <span>Khám phá danh mục</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Hero Visual Column -->
+        <div class="relative w-full aspect-[4/3] rounded-[2.5rem] bg-brand-forest/5 p-2 shadow-2xl">
+            @if (Model.PopularSnacks != null && Model.PopularSnacks.Any())
+            {
+                var featuredSnack = Model.PopularSnacks.First();
+                <div class="w-full h-full rounded-[2.2rem] overflow-hidden relative group">
+                    <img src="@featuredSnack.ImageUrl" 
+                         alt="@featuredSnack.Name" 
+                         class="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-forest/60 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6 p-6 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 text-white">
+                        <p class="text-xs uppercase tracking-widest font-bold text-brand-amber">Món ăn bán chạy nhất</p>
+                        <h3 class="text-xl font-bold hover:text-brand-amber transition-colors mt-0.5">
+                            <a asp-controller="Snacks" asp-action="Details" asp-route-id="@featuredSnack.Id">@featuredSnack.Name</a>
+                        </h3>
+                        <p class="text-sm opacity-90 mt-1 line-clamp-1">@featuredSnack.Description</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="w-full h-full rounded-[2.2rem] overflow-hidden relative group">
+                    <img src="https://images.unsplash.com/photo-1599599810769-bcde5a160d32?q=80&w=800&auto=format&fit=crop" 
+                         alt="Delicious Snacks" 
+                         class="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-forest/40 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6 p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white">
+                        <p class="text-xs uppercase tracking-widest font-bold text-brand-amber">Món ăn bán chạy</p>
+                        <h3 class="text-xl font-bold">Munchies Snacks</h3>
+                        <p class="text-sm opacity-80 mt-1">Khám phá bộ sưu tập đồ ăn vặt tuyệt vời của chúng tôi.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Partner/Trust Logo Wall (Payment Methods) -->
+<section class="py-8 border-y border-brand-forest/5 bg-brand-light">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <p class="text-xs uppercase tracking-widest font-bold text-brand-forest/50">Phương thức thanh toán hỗ trợ</p>
+        <div class="flex flex-wrap gap-4 md:gap-6 items-center justify-center font-bold text-sm text-brand-forest">
+            <!-- COD -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-brand-forest/5 shadow-sm">
+                <i class="ph-bold ph-hand-coins text-xl text-brand-coral"></i>
+                <span>COD (Tiền mặt)</span>
+            </div>
+            <!-- VietQR -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-brand-forest/5 shadow-sm">
+                <i class="ph-bold ph-qr-code text-xl text-brand-coral"></i>
+                <span>Chuyển khoản VietQR</span>
+            </div>
+            <!-- Momo -->
+            <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-brand-forest/5 shadow-sm">
+                <i class="ph-bold ph-wallet text-xl text-brand-coral"></i>
+                <span>Ví điện tử MOMO</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Grid (Asymmetrical Bento) -->
+<section id="categories" class="py-24 px-6 max-w-7xl mx-auto space-y-12">
+    <div class="text-center max-w-xl mx-auto space-y-4">
+        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Danh Mục Ăn Vặt</h2>
+        <p class="text-gray-500">Mỗi danh mục mang đến một thế giới hương vị đặc trưng riêng biệt.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        @for (int i = 0; i < Model.Categories.Count; i++)
+        {
+            var cat = Model.Categories[i];
+            var colSpan = i == 0 ? "md:col-span-8" : i == 1 ? "md:col-span-4" : "md:col-span-6";
+            
+            <div class="@colSpan group relative overflow-hidden rounded-[2rem] bg-brand-forest/5 p-2 aspect-[16/10] md:aspect-auto md:h-96 shadow-sm hover:shadow-md transition-all duration-500">
+                <div class="w-full h-full rounded-[1.8rem] overflow-hidden relative">
+                    <img src="@cat.ImageUrl" alt="@cat.Name" class="w-full h-full object-cover transition-transform duration-[1200ms] group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-forest/80 via-brand-forest/30 to-transparent"></div>
+                    
+                    <div class="absolute bottom-6 left-6 right-6 text-white space-y-2">
+                        <h3 class="text-2xl font-bold">@cat.Name</h3>
+                        <p class="text-sm text-white/80 line-clamp-2">@cat.Description</p>
+                        <div class="pt-2">
+                            <a asp-controller="Snacks" asp-action="Index" asp-route-category="@cat.Id" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-amber hover:text-white transition-colors">
+                                <span>Xem toàn bộ</span>
+                                <i class="ph-bold ph-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Popular Snacks (Double-Bezel Product Cards) -->
+<section class="py-24 bg-brand-light px-6 border-y border-brand-forest/5">
+    <div class="max-w-7xl mx-auto space-y-12">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-forest/5 text-brand-forest text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <span>Món ngon ngẫu hứng</span>
+                </div>
+                <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Món Khách Chuộng Nhất</h2>
+            </div>
+            <a asp-controller="Snacks" asp-action="Index" class="btn-premium btn-premium-secondary">
+                <span>Xem Cửa Hàng</span>
+                <i class="ph ph-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @if (Model.PopularSnacks != null)
+            {
+                @foreach (var snack in Model.PopularSnacks)
+                {
+                <div class="outer-shell">
+                    <div class="inner-core">
+                        <div class="space-y-4">
+                            <!-- Product Image Container -->
+                            <div class="relative aspect-square rounded-[1.3rem] overflow-hidden bg-brand-light group-item">
+                                <img src="@snack.ImageUrl" alt="@snack.Name" class="w-full h-full object-cover transition-transform duration-[800ms] group-hover:scale-105" />
+                                <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-brand-forest text-xs font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                                    <i class="ph-fill ph-star text-yellow-500"></i> @snack.Rating
+                                </span>
+                                @if (snack.StockQuantity <= 0)
+                                {
+                                    <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-1 rounded-md shadow-md">
+                                        Hết hàng
+                                    </span>
+                                }
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="space-y-2">
+                                <p class="text-xs uppercase font-bold tracking-widest text-brand-matcha">@snack.Category?.Name</p>
+                                <h3 class="font-bold text-lg text-brand-forest leading-snug line-clamp-1 hover:text-brand-coral transition-colors">
+                                    <a asp-controller="Snacks" asp-action="Details" asp-route-id="@snack.Id">@snack.Name</a>
+                                </h3>
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <i class="ph ph-scales"></i>
+                                    <span>Trọng lượng: @snack.Weight</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price and Action -->
+                        <div class="flex items-center justify-between border-t border-brand-forest/5 mt-4 pt-4">
+                            <span class="font-mono font-bold text-base text-brand-forest">
+                                @snack.Price.ToString("N0") <span class="text-xs font-sans font-normal">đ</span>
+                            </span>
+                            @if (snack.StockQuantity > 0)
+                            {
+                                <button onclick="addToCart(@snack.Id)" class="w-10 h-10 rounded-full bg-brand-coral hover:bg-brand-coral/90 text-white flex items-center justify-center shadow-sm active:scale-95 transition-all font-bold text-base leading-none">
+                                    +
+                                </button>
+                            }
+                            else
+                            {
+                                <button disabled class="w-10 h-10 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shadow-sm cursor-not-allowed font-bold text-sm leading-none" title="Đã hết hàng">
+                                    x
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Testimonials (Minimalist Editorial Slider) -->
+<section class="py-24 px-6 max-w-7xl mx-auto space-y-12">
+    <div class="text-center max-w-xl mx-auto space-y-4">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-forest/5 text-brand-forest text-[10px] uppercase tracking-[0.2em] font-bold">
+            <span>Lời đánh giá chân thực</span>
+        </div>
+        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Cảm nhận Khách Hàng</h2>
+    </div>
+
+    <!-- Editorial Quotes Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-[2rem] bg-white border border-brand-forest/5 space-y-6 shadow-sm">
+            <div class="text-brand-coral flex gap-1">
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+            </div>
+            <p class="text-gray-600 italic text-sm leading-relaxed">
+                "Bánh tráng trộn rất thơm ngon, sa tế tôm cay nồng vừa phải, đồ ăn được đóng gói sạch sẽ sang xịn mịn như mua ở nhà hàng năm sao vậy đó. Sẽ còn tiếp tục ủng hộ Munchies lâu dài!"
+            </p>
+            <div class="border-t border-brand-forest/5 pt-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-brand-amber/30 flex items-center justify-center font-bold text-brand-forest">
+                    TN
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-brand-forest">Thanh Ngọc</h4>
+                    <p class="text-xs text-gray-400">Khách mua tại Sài Gòn</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 rounded-[2rem] bg-white border border-brand-forest/5 space-y-6 shadow-sm">
+            <div class="text-brand-coral flex gap-1">
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+            </div>
+            <p class="text-gray-600 italic text-sm leading-relaxed">
+                "Khô gà lá chanh giòn rụm không bị ẩm dầu, tỏi phi thơm và ngập lá chanh. Gói hàng cực kì cẩn thận, mở hộp ra là ngửi thấy mùi gà thơm phức rồi. Ăn một lần ghiền luôn."
+            </p>
+            <div class="border-t border-brand-forest/5 pt-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-brand-matcha/30 flex items-center justify-center font-bold text-brand-forest">
+                    HD
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-brand-forest">Hoàng Duy</h4>
+                    <p class="text-xs text-gray-400">Content Creator</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 rounded-[2rem] bg-white border border-brand-forest/5 space-y-6 shadow-sm">
+            <div class="text-brand-coral flex gap-1">
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+                <i class="ph-fill ph-star"></i>
+            </div>
+            <p class="text-gray-600 italic text-sm leading-relaxed">
+                "Hạt điều Bình Phước rang muối của tiệm cực kỳ giòn và béo, hạt đều tăm tắp, vỏ lụa róc dễ bóc. Điểm 10 chất lượng cho đội ngũ phục vụ nhiệt tình và giao hàng nhanh."
+            </p>
+            <div class="border-t border-brand-forest/5 pt-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-brand-forest/20 flex items-center justify-center font-bold text-brand-forest">
+                    MT
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-brand-forest">Minh Trí</h4>
+                    <p class="text-xs text-gray-400">Văn phòng tại Quận 1</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function addToCart(snackId) {
+            $.ajax({
+                url: '/Cart/Add',
+                method: 'POST',
+                data: { snackId: snackId, quantity: 1 },
+                success: function (response) {
+                    if (response.success) {
+                        updateCartBadge();
+                        showToast('Đã thêm sản phẩm vào giỏ hàng thành công!');
+                    } else {
+                        showToast(response.message || 'Có lỗi xảy ra.', 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Không thể kết nối đến máy chủ.', 'error');
+                }
+            });
+        }
+    </script>
+}

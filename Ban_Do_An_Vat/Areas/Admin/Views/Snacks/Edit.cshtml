@@ -1,0 +1,136 @@
+@model Ban_Do_An_Vat.Models.Snack
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa món ăn";
+}
+
+<div class="max-w-3xl mx-auto space-y-6 animate-fade-up">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <a asp-action="Index" class="w-10 h-10 rounded-full bg-white hover:bg-brand-forest/5 text-brand-forest flex items-center justify-center shadow-sm transition-colors border border-brand-forest/5">
+            <i class="ph ph-arrow-left-bold"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-brand-forest">Chỉnh Sửa Món Ăn</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Chỉnh sửa thông tin, giá bán và trạng thái tồn kho.</p>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="p-8 rounded-[1.8rem] bg-white border border-brand-forest/5 shadow-sm">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="space-y-5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                    <div asp-validation-summary="ModelOnly" class="font-semibold"></div>
+                </div>
+            }
+
+            <!-- Name and Category -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Name" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Tên món ăn</label>
+                    <input asp-for="Name" type="text" placeholder="Ví dụ: Cơm cháy chà bông..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                    <span asp-validation-for="Name" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="CategoryId" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Danh mục phân loại</label>
+                    <select asp-for="CategoryId" asp-items="ViewBag.Categories"
+                            class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral">
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+            </div>
+
+            <!-- Price, Weight, Stock, Rating -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Price" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Đơn giá (đ)</label>
+                    <input asp-for="Price" type="number" placeholder="Ví dụ: 35000..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="Price" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Weight" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Trọng lượng</label>
+                    <input asp-for="Weight" type="text" placeholder="Ví dụ: 150g..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="Weight" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="StockQuantity" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Số lượng kho</label>
+                    <input asp-for="StockQuantity" type="number" placeholder="Ví dụ: 100..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="StockQuantity" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="Rating" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Đánh giá gốc</label>
+                    <input asp-for="Rating" type="text" placeholder="Từ 1.0 đến 5.0..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral font-mono" />
+                    <span asp-validation-for="Rating" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="flex flex-col gap-1.5">
+                <label asp-for="Description" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Mô tả chi tiết</label>
+                <textarea asp-for="Description" rows="3" placeholder="Nhập mô tả sản phẩm cho khách hàng xem..."
+                          class="w-full bg-brand-light border border-brand-forest/5 rounded-[1.5rem] px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral"></textarea>
+                <span asp-validation-for="Description" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+            </div>
+
+            <!-- Ingredients -->
+            <div class="flex flex-col gap-1.5">
+                <label asp-for="Ingredients" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Thành phần nguyên liệu</label>
+                <input asp-for="Ingredients" type="text" placeholder="Ví dụ: Bột nếp, chà bông, tỏi, ớt..."
+                       class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                <span asp-validation-for="Ingredients" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+            </div>
+
+            <!-- Image Option: Upload or URL -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold uppercase tracking-wider text-brand-forest">Tải lên hình ảnh từ máy tính (Thay thế ảnh cũ)</label>
+                    <input type="file" name="ImageFile" accept="image/*"
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label asp-for="ImageUrl" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Hoặc đường dẫn hình ảnh (URL)</label>
+                    <input asp-for="ImageUrl" type="text" placeholder="https://images.unsplash.com/photo-..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-xs focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                    <span asp-validation-for="ImageUrl" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+            </div>
+
+            <!-- IsAvailable -->
+            <div class="flex items-center gap-3 py-2">
+                <input asp-for="IsAvailable" type="checkbox" id="is-available-chk"
+                       class="w-4 h-4 rounded border-brand-forest/20 text-brand-coral focus:ring-brand-coral accent-brand-coral" />
+                <label for="is-available-chk" class="text-xs font-bold uppercase tracking-wider text-brand-forest cursor-pointer">Sẵn sàng mở bán sản phẩm này</label>
+            </div>
+
+            <!-- Actions buttons -->
+            <div class="flex gap-4 pt-4 border-t border-brand-forest/5">
+                <button type="submit" class="btn-premium btn-premium-primary text-xs py-2.5 shadow-sm px-6">
+                    <i class="ph ph-floppy-disk"></i>
+                    <span>Cập nhật món ăn</span>
+                </button>
+                <a asp-action="Index" class="btn-premium btn-premium-secondary text-xs py-2.5 px-6">
+                    <span>Hủy bỏ</span>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

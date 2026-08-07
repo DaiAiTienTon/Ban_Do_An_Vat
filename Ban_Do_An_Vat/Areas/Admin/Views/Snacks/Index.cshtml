@@ -1,0 +1,115 @@
+@model List<Ban_Do_An_Vat.Models.Snack>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý món ăn";
+}
+
+<div class="space-y-6 animate-fade-up">
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-brand-forest">Danh Sách Món Ăn</h1>
+            <p class="text-xs text-gray-500 mt-1">Quản lý kho hàng, thông tin sản phẩm và trạng thái kinh doanh.</p>
+        </div>
+        <a asp-action="Create" class="btn-premium btn-premium-primary text-xs py-2 shadow-sm">
+            <i class="ph ph-plus-bold"></i>
+            <span>Thêm Món Ăn Mới</span>
+        </a>
+    </div>
+
+    <!-- Data Panel -->
+    <div class="bg-white border border-brand-forest/5 rounded-[1.5rem] shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-brand-forest/5 flex items-center justify-between">
+            <span class="text-xs font-bold text-gray-500 uppercase">Tổng cộng: @Model.Count món ăn</span>
+        </div>
+        
+        <!-- Table container -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-brand-forest/5 text-gray-400 text-[10px] uppercase font-bold tracking-wider bg-brand-light/50">
+                        <th class="p-4 pl-6">Sản phẩm</th>
+                        <th class="p-4">Danh mục</th>
+                        <th class="p-4 text-right">Đơn giá</th>
+                        <th class="p-4 text-center">Tồn kho</th>
+                        <th class="p-4 text-center">Trạng thái</th>
+                        <th class="p-4 text-center">Đánh giá</th>
+                        <th class="p-4 pr-6 text-right">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-brand-forest/5 text-xs">
+                    @foreach (var item in Model)
+                    {
+                        var stockClass = item.StockQuantity == 0 ? "bg-red-50 text-red-700" :
+                                         item.StockQuantity <= 15 ? "bg-yellow-50 text-yellow-700" : "bg-green-50 text-green-700";
+                                         
+                        <tr class="hover:bg-brand-light/30 transition-colors">
+                            <td class="p-4 pl-6 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-brand-light flex-shrink-0">
+                                    <img src="@item.ImageUrl" alt="@item.Name" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="truncate max-w-[20ch]">
+                                    <h4 class="font-bold text-brand-forest truncate text-sm">@item.Name</h4>
+                                    <p class="text-[10px] text-gray-400">@item.Weight</p>
+                                </div>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-2.5 py-1 rounded-full font-semibold text-[10px] bg-brand-forest/5 text-brand-forest">
+                                    @item.Category?.Name
+                                </span>
+                            </td>
+                            <td class="p-4 text-right font-mono font-bold text-brand-forest">
+                                @item.Price.ToString("N0") đ
+                            </td>
+                            <td class="p-4 text-center">
+                                <span class="px-2.5 py-1 rounded-full font-bold @stockClass">
+                                    @item.StockQuantity
+                                </span>
+                            </td>
+                            <td class="p-4 text-center">
+                                @if (item.IsAvailable && item.StockQuantity > 0)
+                                {
+                                    <span class="text-green-600 font-bold flex items-center justify-center gap-1">
+                                        <i class="ph-fill ph-check-circle"></i>
+                                        <span>Đang bán</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-red-500 font-bold flex items-center justify-center gap-1">
+                                        <i class="ph-fill ph-minus-circle"></i>
+                                        <span>Dừng bán</span>
+                                    </span>
+                                }
+                            </td>
+                            <td class="p-4 text-center font-bold text-brand-forest">
+                                <span class="flex items-center justify-center gap-0.5">
+                                    <i class="ph-fill ph-star text-yellow-500"></i>
+                                    <span>@item.Rating</span>
+                                </span>
+                            </td>
+                            <td class="p-4 pr-6 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <!-- Edit Link -->
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-brand-forest text-white hover:bg-brand-matcha text-xs font-bold transition-all shadow-sm">
+                                        <i class="ph ph-pencil-simple"></i>
+                                        <span>Sửa</span>
+                                    </a>
+                                    
+                                    <!-- Delete Form -->
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all shadow-sm">
+                                            <i class="ph ph-trash"></i>
+                                            <span>Xóa</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

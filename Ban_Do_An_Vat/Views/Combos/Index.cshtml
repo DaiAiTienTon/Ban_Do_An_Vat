@@ -1,0 +1,223 @@
+@model IEnumerable<Ban_Do_An_Vat.Models.Combo>
+@{
+    ViewData["Title"] = "Combo Ưu Đãi - Munchies";
+    ViewData["Description"] = "Mua combo đồ ăn vặt Munchies với giá siêu tiết kiệm – bộ sưu tập combo đặc biệt giảm giá hấp dẫn nhất";
+}
+
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-brand-forest via-brand-matcha to-brand-forest overflow-hidden py-20 px-6">
+    <!-- Decorative circles -->
+    <div class="absolute top-0 right-0 w-96 h-96 bg-brand-coral/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-brand-amber/10 rounded-full translate-y-1/2 -translate-x-1/3 blur-3xl"></div>
+
+    <div class="max-w-7xl mx-auto relative z-10 text-center">
+        <div class="inline-flex items-center gap-2 bg-brand-coral/20 border border-brand-coral/30 text-brand-coral rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest mb-6">
+            <i class="ph ph-lightning"></i>
+            Tiết Kiệm Hơn Khi Mua Combo
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+            Combo <span class="text-brand-amber">Ưu Đãi</span>
+        </h1>
+        <p class="text-brand-bone/70 text-lg max-w-xl mx-auto leading-relaxed">
+            Kết hợp những món ăn vặt yêu thích thành bộ combo siêu tiết kiệm — mua nhiều hơn, tiết kiệm nhiều hơn!
+        </p>
+
+        <div class="flex items-center justify-center gap-8 mt-10">
+            <div class="text-center">
+                <p class="text-3xl font-extrabold text-brand-amber">@Model.Count()</p>
+                <p class="text-xs text-brand-bone/60 uppercase tracking-wider mt-1">Combo đang có</p>
+            </div>
+            <div class="w-px h-12 bg-brand-bone/20"></div>
+            <div class="text-center">
+                <p class="text-3xl font-extrabold text-brand-amber">@(Model.Any() ? Model.Max(c => c.DiscountPercent) : 0)%</p>
+                <p class="text-xs text-brand-bone/60 uppercase tracking-wider mt-1">Giảm cao nhất</p>
+            </div>
+            <div class="w-px h-12 bg-brand-bone/20"></div>
+            <div class="text-center">
+                <p class="text-3xl font-extrabold text-brand-amber">@(Model.Any() ? Model.Sum(c => c.ComboItems.Count) : 0)</p>
+                <p class="text-xs text-brand-bone/60 uppercase tracking-wider mt-1">Sản phẩm tham gia</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Combo Grid -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+    @if (!Model.Any())
+    {
+        <div class="flex flex-col items-center justify-center py-24 text-gray-400">
+            <i class="ph ph-package text-7xl text-gray-200 mb-6"></i>
+            <h3 class="text-xl font-bold text-gray-500">Chưa có combo nào</h3>
+            <p class="text-sm mt-2 text-gray-400">Vui lòng quay lại sau nhé!</p>
+            <a asp-controller="Snacks" asp-action="Index"
+               class="mt-6 inline-flex items-center gap-2 bg-brand-coral text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-brand-coral/90 transition-all">
+                <i class="ph ph-storefront"></i>
+                Xem Cửa Hàng
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            @foreach (var combo in Model)
+            {
+                <div class="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-brand-forest/5 flex flex-col">
+                    <!-- Image / Top -->
+                    <div class="relative h-56 bg-gradient-to-br from-brand-amber/20 to-brand-coral/10 overflow-hidden">
+                        @if (!string.IsNullOrEmpty(combo.ImageUrl))
+                        {
+                            <img src="@combo.ImageUrl" alt="@combo.Name"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        }
+                        else
+                        {
+                            <div class="w-full h-full flex flex-col items-center justify-center gap-2">
+                                <i class="ph ph-package text-6xl text-brand-amber/50"></i>
+                                <p class="text-xs text-brand-amber/70 font-medium">COMBO</p>
+                            </div>
+                        }
+
+                        <!-- Discount Badge -->
+                        <div class="absolute top-4 left-4">
+                            <div class="bg-brand-coral text-white text-sm font-extrabold px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1">
+                                <i class="ph-bold ph-lightning text-xs"></i>
+                                TIẾT KIỆM @combo.DiscountPercent%
+                            </div>
+                        </div>
+
+                        <!-- Item Count Badge -->
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-brand-forest/80 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1.5 rounded-lg">
+                                @combo.ComboItems.Count sản phẩm
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-lg font-extrabold text-brand-forest group-hover:text-brand-coral transition-colors leading-tight">
+                            @combo.Name
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-2 leading-relaxed line-clamp-2 flex-grow">
+                            @combo.Description
+                        </p>
+
+                        <!-- Product Tags -->
+                        <div class="mt-4 flex flex-wrap gap-1.5">
+                            @foreach (var item in combo.ComboItems.Take(4))
+                            {
+                                <span class="bg-brand-forest/5 text-brand-forest text-xs px-2.5 py-1 rounded-full font-medium border border-brand-forest/10">
+                                    @item.Snack?.Name
+                                    @if (item.Quantity > 1)
+                                    {
+                                        <span class="text-brand-coral font-bold"> ×@item.Quantity</span>
+                                    }
+                                </span>
+                            }
+                            @if (combo.ComboItems.Count > 4)
+                            {
+                                <span class="bg-gray-100 text-gray-400 text-xs px-2.5 py-1 rounded-full">+@(combo.ComboItems.Count - 4) khác</span>
+                            }
+                        </div>
+
+                        <!-- Price Block -->
+                        <div class="mt-5 pt-5 border-t border-brand-forest/5">
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-400 font-medium mb-0.5">Giá gốc</p>
+                                    <p class="text-base text-gray-400 line-through font-semibold">@combo.OriginalPrice.ToString("N0")đ</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-brand-coral font-bold uppercase tracking-wide mb-0.5">Giá combo</p>
+                                    <p class="text-2xl font-extrabold text-brand-coral">@combo.SalePrice.ToString("N0")đ</p>
+                                </div>
+                            </div>
+
+                            <!-- Savings bar -->
+                            <div class="mt-3 bg-green-50 rounded-xl px-3 py-2 flex items-center gap-2">
+                                <i class="ph ph-piggy-bank text-green-500 text-base"></i>
+                                <p class="text-xs font-semibold text-green-700">
+                                    Tiết kiệm <span class="font-extrabold">@((combo.OriginalPrice - combo.SalePrice).ToString("N0"))đ</span> so với mua lẻ
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- CTA Buttons -->
+                        <div class="mt-4 flex gap-2">
+                            <a asp-controller="Combos" asp-action="Details" asp-route-id="@combo.Id"
+                               class="flex-1 border-2 border-brand-forest text-brand-forest text-sm font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 hover:bg-brand-forest hover:text-white transition-all duration-200">
+                                <i class="ph ph-eye text-base"></i> Chi tiết
+                            </a>
+                            <button onclick="addComboToCart(@combo.Id, '@Html.Raw(combo.Name.Replace("'", "\\'"))')"
+                                    class="flex-1 bg-brand-coral hover:bg-brand-coral/85 text-white text-sm font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:shadow-md">
+                                <i class="ph ph-shopping-cart-simple text-base"></i> Thêm giỏ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<!-- CTA Banner -->
+<section class="max-w-7xl mx-auto px-6 pb-16">
+    <div class="bg-gradient-to-r from-brand-coral to-brand-amber rounded-3xl p-10 text-center text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/4"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/4"></div>
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-3">Không thấy combo phù hợp?</h2>
+            <p class="text-white/80 mb-6">Khám phá hơn 100+ sản phẩm đồ ăn vặt tại cửa hàng của chúng tôi</p>
+            <a asp-controller="Snacks" asp-action="Index"
+               class="inline-flex items-center gap-2 bg-white text-brand-coral font-bold px-8 py-3.5 rounded-xl hover:bg-brand-bone transition-all hover:shadow-lg hover:-translate-y-0.5">
+                <i class="ph ph-storefront text-lg"></i>
+                Khám Phá Cửa Hàng
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Toast notification -->
+<div id="combo-toast"
+     class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9995] hidden bg-brand-forest text-white text-sm font-semibold px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transition-all">
+    <i class="ph ph-check-circle text-green-400 text-lg"></i>
+    <span id="combo-toast-msg">Combo đã thêm vào giỏ hàng!</span>
+</div>
+
+@section Scripts {
+<script>
+    function addComboToCart(comboId, comboName) {
+        $.ajax({
+            url: '/Cart/AddCombo',
+            method: 'POST',
+            data: { comboId: comboId, quantity: 1 },
+            success: function(res) {
+                if (res.success) {
+                    showComboToast('✅ «' + comboName + '» đã thêm vào giỏ!');
+                    // Cập nhật cart counter nếu có
+                    if (res.cartCount !== undefined) {
+                        var badge = document.getElementById('cart-count-badge') || document.getElementById('cart-badge-count');
+                        if (badge) { badge.textContent = res.cartCount; badge.classList.remove('hidden'); }
+                    }
+                } else {
+                    showComboToast('❌ ' + (res.message || 'Không thể thêm combo!'), true);
+                }
+            },
+            error: function() { showComboToast('❌ Lỗi kết nối!', true); }
+        });
+    }
+
+    function showComboToast(msg, isError) {
+        var toast = document.getElementById('combo-toast');
+        document.getElementById('combo-toast-msg').textContent = msg;
+        toast.classList.remove('hidden');
+        toast.style.opacity = '1';
+        if (isError) toast.classList.add('bg-red-600');
+        else toast.classList.remove('bg-red-600');
+        setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.classList.add('hidden'); }, 300); }, 3000);
+    }
+</script>
+}
+

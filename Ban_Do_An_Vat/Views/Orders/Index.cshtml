@@ -1,0 +1,79 @@
+@model IEnumerable<Ban_Do_An_Vat.Models.Order>
+@{
+    ViewData["Title"] = "Đơn Hàng Của Tôi";
+}
+
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="mb-8">
+        <h1 class="text-3xl font-extrabold text-brand-forest">Đơn Hàng Của Tôi</h1>
+        <p class="text-brand-forest/60 mt-2">Theo dõi trạng thái các đơn hàng bạn đã đặt.</p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="bg-white rounded-3xl p-12 text-center shadow-sm border border-brand-forest/5">
+            <div class="w-24 h-24 bg-brand-forest/5 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-forest">
+                <i class="ph ph-package text-4xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-brand-forest mb-2">Bạn chưa có đơn hàng nào</h3>
+            <p class="text-brand-forest/60 mb-6">Hãy khám phá các món ăn vặt thơm ngon của chúng tôi nhé!</p>
+            <a asp-controller="Snacks" asp-action="Index" class="inline-flex items-center gap-2 bg-brand-coral text-white px-8 py-3 rounded-full font-bold hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20">
+                <span>Mua sắm ngay</span>
+                <i class="ph ph-arrow-right font-bold"></i>
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-brand-forest/5">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-brand-bone text-brand-forest text-sm uppercase tracking-wider">
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Mã Đơn</th>
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Ngày Đặt</th>
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Tổng Tiền</th>
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Trạng Thái</th>
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Thanh Toán</th>
+                            <th class="p-4 font-bold border-b border-brand-forest/5">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-forest/5">
+                        @foreach (var order in Model)
+                        {
+                            <tr class="hover:bg-brand-bone/50 transition-colors">
+                                <td class="p-4 font-mono font-bold">#@order.Id</td>
+                                <td class="p-4 text-sm">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="p-4 font-bold text-brand-coral">@order.TotalAmount.ToString("N0")đ</td>
+                                <td class="p-4">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full 
+                                        @(order.Status == "Pending" ? "bg-yellow-100 text-yellow-700" : 
+                                          order.Status == "Processing" ? "bg-blue-100 text-blue-700" :
+                                          order.Status == "Shipped" ? "bg-purple-100 text-purple-700" :
+                                          order.Status == "Delivered" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+                                        @(order.Status == "Pending" ? "Chờ xác nhận" : 
+                                          order.Status == "Processing" ? "Đang xử lý" :
+                                          order.Status == "Shipped" ? "Đang giao" :
+                                          order.Status == "Delivered" ? "Đã giao" : "Đã hủy")
+                                    </span>
+                                </td>
+                                <td class="p-4">
+                                    <span class="text-sm font-semibold @(order.PaymentStatus == "Paid" ? "text-green-600" : "text-gray-500")">
+                                        @(order.PaymentStatus == "Paid" ? "Đã thanh toán" : order.PaymentStatus == "Unpaid" ? "Chưa thanh toán" : "Lỗi")
+                                    </span>
+                                    <div class="text-xs text-gray-400">@order.PaymentMethod</div>
+                                </td>
+                                <td class="p-4">
+                                    <a asp-action="Details" asp-route-id="@order.Id" class="text-brand-matcha hover:text-brand-coral font-semibold text-sm inline-flex items-center gap-1 transition-colors">
+                                        <span>Chi tiết</span>
+                                        <i class="ph ph-caret-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,219 @@
+@model Ban_Do_An_Vat.Models.Order
+@{
+    ViewData["Title"] = "Thanh Toán";
+    var cart = ViewBag.Cart as List<CartItem> ?? new List<CartItem>();
+    decimal cartTotal = ViewBag.CartTotal is decimal ? (decimal)ViewBag.CartTotal : 0;
+    decimal shippingFee = ViewBag.ShippingFee is decimal ? (decimal)ViewBag.ShippingFee : 20000;
+    decimal discount = ViewBag.Discount is decimal ? (decimal)ViewBag.Discount : 0;
+    string couponCode = ViewBag.CouponCode as string ?? "";
+    decimal grandTotal = cartTotal + shippingFee - discount;
+}
+
+<section class="max-w-7xl mx-auto px-6 py-12 md:py-20 animate-fade-up">
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-brand-forest">Thanh Toán Đơn Hàng</h1>
+        <p class="text-gray-500 mt-2">Vui lòng điền thông tin giao hàng để hoàn tất đơn hàng.</p>
+    </div>
+
+    <!-- Checkout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+        
+        <!-- Left Column: Shipping Form (col-span-3) -->
+        <div class="lg:col-span-3 p-8 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-6">
+            <h3 class="text-xl font-bold text-brand-forest border-b border-brand-forest/5 pb-4">Thông tin giao hàng</h3>
+            
+            <form asp-action="Checkout" method="post" class="space-y-4">
+                @Html.AntiForgeryToken()
+                
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                        <div asp-validation-summary="ModelOnly" class="font-semibold"></div>
+                    </div>
+                }
+
+                <!-- CustomerName -->
+                <div class="flex flex-col gap-2">
+                    <label asp-for="CustomerName" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Họ và tên khách hàng</label>
+                    <input asp-for="CustomerName" type="text" placeholder="Nhập đầy đủ họ và tên..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                    <span asp-validation-for="CustomerName" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <!-- CustomerEmail and Phone side-by-side -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="CustomerEmail" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Email nhận hóa đơn</label>
+                        <input asp-for="CustomerEmail" type="email" placeholder="example@gmail.com..."
+                               class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                        <span asp-validation-for="CustomerEmail" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label asp-for="CustomerPhone" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Số điện thoại liên hệ</label>
+                        <input asp-for="CustomerPhone" type="tel" placeholder="09xxxx..."
+                               class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                        <span asp-validation-for="CustomerPhone" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                    </div>
+                </div>
+
+                <!-- DeliveryAddress -->
+                <div class="flex flex-col gap-2">
+                    <label asp-for="DeliveryAddress" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Địa chỉ giao hàng</label>
+                    <input asp-for="DeliveryAddress" type="text" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
+                           class="w-full bg-brand-light border border-brand-forest/5 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral" />
+                    <span asp-validation-for="DeliveryAddress" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <!-- OrderNotes -->
+                <div class="flex flex-col gap-2">
+                    <label asp-for="OrderNotes" class="text-xs font-bold uppercase tracking-wider text-brand-forest">Ghi chú giao hàng</label>
+                    <textarea asp-for="OrderNotes" rows="3" placeholder="Ghi chú thêm (ví dụ: giao giờ hành chính, gọi trước khi giao...)..."
+                              class="w-full bg-brand-light border border-brand-forest/5 rounded-[1.5rem] px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-coral focus:border-brand-coral"></textarea>
+                    <span asp-validation-for="OrderNotes" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <!-- PaymentMethod -->
+                <div class="flex flex-col gap-3 pt-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-brand-forest">Phương thức thanh toán</label>
+                    
+                    @if (TempData["PaymentError"] != null)
+                    {
+                        <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+                            @TempData["PaymentError"]
+                        </div>
+                    }
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- COD Card -->
+                        <label class="relative flex items-center justify-between p-4 rounded-2xl bg-brand-light border border-brand-forest/10 cursor-pointer hover:border-brand-coral transition duration-200 select-none group has-[:checked]:border-brand-coral has-[:checked]:bg-brand-coral/5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-brand-forest border border-brand-forest/5 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                                    <i class="ph ph-hand-coins text-xl text-brand-matcha"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-bold text-xs text-brand-forest">COD</h4>
+                                    <p class="text-[10px] text-gray-400">Khi nhận hàng</p>
+                                </div>
+                            </div>
+                            <input type="radio" asp-for="PaymentMethod" value="COD" checked class="w-4 h-4 text-brand-coral border-gray-300 focus:ring-brand-coral accent-brand-coral" />
+                        </label>
+
+                        <!-- VietQR Card -->
+                        <label class="relative flex items-center justify-between p-4 rounded-2xl bg-brand-light border border-brand-forest/10 cursor-pointer hover:border-brand-coral transition duration-200 select-none group has-[:checked]:border-brand-coral has-[:checked]:bg-brand-coral/5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-brand-forest border border-brand-forest/5 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                                    <i class="ph ph-qr-code text-xl text-brand-matcha"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-bold text-xs text-brand-forest">VietQR</h4>
+                                    <p class="text-[10px] text-gray-400">Quét mã ngân hàng</p>
+                                </div>
+                            </div>
+                            <input type="radio" asp-for="PaymentMethod" value="VietQR" class="w-4 h-4 text-brand-coral border-gray-300 focus:ring-brand-coral accent-brand-coral" />
+                        </label>
+
+                        <!-- MoMo Card -->
+                        <label class="relative flex items-center justify-between p-4 rounded-2xl bg-brand-light border border-brand-forest/10 cursor-pointer hover:border-brand-coral transition duration-200 select-none group has-[:checked]:border-brand-coral has-[:checked]:bg-brand-coral/5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-brand-forest border border-brand-forest/5 shadow-sm overflow-hidden group-hover:scale-105 transition-transform duration-200">
+                                    <svg viewBox="0 0 100 100" class="w-6 h-6">
+                                        <rect width="100" height="100" rx="20" fill="#a50064"/>
+                                        <circle cx="50" cy="50" r="22" fill="#fff"/>
+                                        <circle cx="50" cy="50" r="16" fill="#a50064"/>
+                                        <circle cx="50" cy="50" r="10" fill="#fff"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-bold text-xs text-brand-forest">Ví MoMo</h4>
+                                    <p class="text-[10px] text-gray-400">Ví điện tử MoMo</p>
+                                </div>
+                            </div>
+                            <input type="radio" asp-for="PaymentMethod" value="Momo" class="w-4 h-4 text-brand-coral border-gray-300 focus:ring-brand-coral accent-brand-coral" />
+                        </label>
+                    </div>
+                    <span asp-validation-for="PaymentMethod" class="text-xs text-red-600 font-semibold mt-0.5"></span>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full btn-premium btn-premium-primary group shadow-md py-3.5">
+                        <span>Xác Nhận Đặt Hàng</span>
+                        <span class="btn-icon-wrapper">
+                            <i class="ph ph-check-bold"></i>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column: Order Details Summary (col-span-2) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Review Products Card -->
+            <div class="p-6 rounded-[2rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+                <h3 class="text-lg font-bold text-brand-forest border-b border-brand-forest/5 pb-3">Chi tiết giỏ hàng</h3>
+                
+                <div class="max-h-60 overflow-y-auto divide-y divide-brand-forest/5 pr-2">
+                    @foreach (var item in cart)
+                    {
+                        <div class="py-3 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-brand-light flex-shrink-0">
+                                    <img src="@item.ImageUrl" alt="@item.Name" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="max-w-[15ch]">
+                                    <h4 class="font-bold text-brand-forest text-xs truncate">
+                                        @if (item.IsCombo)
+                                        {
+                                            <span class="inline-block bg-brand-coral text-white text-[9px] font-extrabold px-1 rounded mr-1">COMBO</span>
+                                        }
+                                        @item.Name
+                                    </h4>
+                                    <p class="text-[10px] text-gray-400">SL: @item.Quantity x @item.Price.ToString("N0")</p>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xs font-bold text-brand-forest">@item.TotalPrice.ToString("N0") đ</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="border-t border-brand-forest/5 pt-4 space-y-2 text-xs">
+                    <div class="flex justify-between text-gray-500 font-semibold">
+                        <span>Tạm tính:</span>
+                        <span class="font-mono text-brand-forest">@cartTotal.ToString("N0") đ</span>
+                    </div>
+                    <div class="flex justify-between text-gray-500 font-semibold">
+                        <span>Phí vận chuyển:</span>
+                        <span class="font-mono text-brand-forest">@shippingFee.ToString("N0") đ</span>
+                    </div>
+                    @if (discount > 0)
+                    {
+                        <div class="flex justify-between text-brand-coral font-semibold">
+                            <span>Mã giảm giá (@couponCode):</span>
+                            <span class="font-mono">-@discount.ToString("N0") đ</span>
+                        </div>
+                    }
+                    <div class="flex justify-between border-t border-brand-forest/5 pt-2 text-sm font-bold">
+                        <span class="text-brand-forest">Tổng tiền:</span>
+                        <span class="font-mono text-brand-coral">@grandTotal.ToString("N0") đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Banner -->
+            <div class="p-6 rounded-[2rem] bg-brand-forest text-brand-bone space-y-4">
+                <div class="flex items-center gap-2">
+                    <i class="ph ph-shield-check text-2xl text-brand-amber"></i>
+                    <h4 class="font-bold text-sm">Giao Hàng Đảm Bảo</h4>
+                </div>
+                <p class="text-xs text-brand-bone/80 leading-relaxed">
+                    Mọi đơn hàng đều được chế biến và đóng gói an toàn vệ sinh thực phẩm. Munchies hoàn tiền 100% nếu sản phẩm không đúng chất lượng cam kết.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,116 @@
+@model Ban_Do_An_Vat.Models.Order
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng #" + Model.Id;
+}
+
+<div class="max-w-4xl mx-auto px-6 py-12">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-brand-forest">Đơn Hàng #@Model.Id</h1>
+            <p class="text-brand-forest/60 mt-1">Ngày đặt: @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+        <a asp-action="Index" class="inline-flex items-center gap-2 text-brand-forest font-semibold hover:text-brand-coral transition-colors">
+            <i class="ph ph-arrow-left"></i>
+            <span>Quay lại danh sách</span>
+        </a>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-brand-forest/5 overflow-hidden mb-8">
+        <div class="p-6 md:p-8 border-b border-brand-forest/5">
+            <h2 class="text-xl font-bold text-brand-forest mb-6">Trạng thái & Thanh toán</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="bg-brand-bone rounded-2xl p-4">
+                    <span class="block text-sm font-semibold text-brand-forest/60 mb-2">Trạng thái giao hàng</span>
+                    <span class="inline-block px-4 py-2 rounded-full font-bold text-sm
+                        @(Model.Status == "Pending" ? "bg-yellow-100 text-yellow-700" : 
+                          Model.Status == "Processing" ? "bg-blue-100 text-blue-700" :
+                          Model.Status == "Shipped" ? "bg-purple-100 text-purple-700" :
+                          Model.Status == "Delivered" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
+                        @(Model.Status == "Pending" ? "Chờ xác nhận" : 
+                          Model.Status == "Processing" ? "Đang xử lý" :
+                          Model.Status == "Shipped" ? "Đang giao" :
+                          Model.Status == "Delivered" ? "Đã giao" : "Đã hủy")
+                    </span>
+                </div>
+                <div class="bg-brand-bone rounded-2xl p-4">
+                    <span class="block text-sm font-semibold text-brand-forest/60 mb-2">Trạng thái thanh toán</span>
+                    <span class="inline-block px-4 py-2 rounded-full font-bold text-sm
+                        @(Model.PaymentStatus == "Paid" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-700")">
+                        @(Model.PaymentStatus == "Paid" ? "Đã thanh toán" : Model.PaymentStatus == "Unpaid" ? "Chưa thanh toán" : "Lỗi thanh toán")
+                    </span>
+                    <div class="mt-2 text-sm font-semibold text-brand-forest">
+                        Phương thức: @(Model.PaymentMethod == "Momo" ? "Ví MoMo" : Model.PaymentMethod == "VietQR" ? "Chuyển khoản (VietQR)" : "Thanh toán khi nhận hàng (COD)")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8 border-b border-brand-forest/5">
+            <h2 class="text-xl font-bold text-brand-forest mb-6">Thông tin giao hàng</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                <div>
+                    <span class="block text-brand-forest/60 font-semibold mb-1">Người nhận</span>
+                    <span class="font-bold text-brand-forest text-base">@Model.CustomerName</span>
+                </div>
+                <div>
+                    <span class="block text-brand-forest/60 font-semibold mb-1">Số điện thoại</span>
+                    <span class="font-bold text-brand-forest text-base">@Model.CustomerPhone</span>
+                </div>
+                <div class="md:col-span-2">
+                    <span class="block text-brand-forest/60 font-semibold mb-1">Email</span>
+                    <span class="font-bold text-brand-forest text-base">@Model.CustomerEmail</span>
+                </div>
+                <div class="md:col-span-2">
+                    <span class="block text-brand-forest/60 font-semibold mb-1">Địa chỉ</span>
+                    <span class="font-bold text-brand-forest text-base">@Model.DeliveryAddress</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.OrderNotes))
+                {
+                    <div class="md:col-span-2">
+                        <span class="block text-brand-forest/60 font-semibold mb-1">Ghi chú</span>
+                        <div class="bg-yellow-50 text-yellow-800 p-3 rounded-xl">@Model.OrderNotes</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <h2 class="text-xl font-bold text-brand-forest mb-6">Sản phẩm đã đặt</h2>
+            <div class="space-y-4 mb-6">
+                @foreach (var item in Model.OrderItems)
+                {
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-brand-bone/50 border border-brand-bone hover:border-brand-forest/10 transition-colors">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden bg-white shrink-0 shadow-sm">
+                            <img src="@item.Snack?.ImageUrl" alt="@item.Snack?.Name" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-brand-forest">@(item.Snack?.Name ?? "Sản phẩm")</h4>
+                            <div class="text-sm text-brand-forest/60">Số lượng: @item.Quantity</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-brand-coral">@item.Price.ToString("N0")đ</div>
+                            <div class="text-xs text-brand-forest/60 font-semibold mt-1">
+                                Tổng: @((item.Quantity * item.Price).ToString("N0"))đ
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="border-t border-brand-forest/10 pt-6">
+                <div class="flex justify-between items-center mb-2 text-brand-forest/80 font-semibold text-sm">
+                    <span>Tạm tính</span>
+                    <span>@Model.OrderItems.Sum(i => i.Quantity * i.Price).ToString("N0")đ</span>
+                </div>
+                <div class="flex justify-between items-center mb-4 text-brand-forest/80 font-semibold text-sm">
+                    <span>Phí giao hàng</span>
+                    <span>@(Model.TotalAmount - Model.OrderItems.Sum(i => i.Quantity * i.Price) > 0 ? "20,000đ" : "Miễn phí")</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-brand-forest/10 pt-4">
+                    <span class="text-lg font-bold text-brand-forest">Tổng cộng</span>
+                    <span class="text-2xl font-extrabold text-brand-coral">@Model.TotalAmount.ToString("N0")đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

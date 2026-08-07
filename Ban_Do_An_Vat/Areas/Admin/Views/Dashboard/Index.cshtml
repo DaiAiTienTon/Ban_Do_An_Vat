@@ -1,0 +1,161 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Bảng điều khiển";
+    
+    decimal totalRevenue = ViewBag.TotalRevenue is decimal ? (decimal)ViewBag.TotalRevenue : 0;
+    int totalOrders = ViewBag.TotalOrders is int ? (int)ViewBag.TotalOrders : 0;
+    int lowStockCount = ViewBag.LowStockCount is int ? (int)ViewBag.LowStockCount : 0;
+    int outOfStockCount = ViewBag.OutOfStockCount is int ? (int)ViewBag.OutOfStockCount : 0;
+    
+    var recentOrders = ViewBag.RecentOrders as List<Ban_Do_An_Vat.Models.Order> ?? new List<Ban_Do_An_Vat.Models.Order>();
+    var warningProducts = ViewBag.WarningProducts as List<Ban_Do_An_Vat.Models.Snack> ?? new List<Ban_Do_An_Vat.Models.Snack>();
+}
+
+<div class="space-y-8 animate-fade-up">
+    <!-- Top Greeting / Intro -->
+    <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-brand-forest">Xin chào, Quản trị viên</h1>
+        <p class="text-xs text-gray-500 mt-1">Dưới đây là thống kê tình hình hoạt động của tiệm ăn vặt Munchies.</p>
+    </div>
+
+    <!-- Bento Metric Cards (1/4 columns) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Revenue Card -->
+        <div class="p-6 rounded-[1.5rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Doanh thu (Không hủy)</span>
+                <span class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                    <i class="ph ph-trend-up text-lg"></i>
+                </span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-2xl font-mono font-extrabold text-brand-forest">@totalRevenue.ToString("N0") <span class="text-xs font-sans font-normal">đ</span></h3>
+                <p class="text-[10px] text-brand-matcha font-bold"><i class="ph ph-arrow-up-right"></i> +12.4% so với tháng trước</p>
+            </div>
+        </div>
+
+        <!-- Orders Card -->
+        <div class="p-6 rounded-[1.5rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Tổng số đơn hàng</span>
+                <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="ph ph-shopping-cart text-lg"></i>
+                </span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-2xl font-mono font-extrabold text-brand-forest">@totalOrders <span class="text-xs font-sans font-normal">đơn</span></h3>
+                <p class="text-[10px] text-blue-600 font-bold"><i class="ph ph-clock"></i> Cập nhật liên tục</p>
+            </div>
+        </div>
+
+        <!-- Low Stock Card -->
+        <div class="p-6 rounded-[1.5rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Sắp hết hàng (<= 15)</span>
+                <span class="w-8 h-8 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center">
+                    <i class="ph ph-warning text-lg"></i>
+                </span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-2xl font-mono font-extrabold text-brand-forest">@lowStockCount <span class="text-xs font-sans font-normal">món</span></h3>
+                <p class="text-[10px] text-yellow-600 font-bold"><i class="ph ph-shield-warning"></i> Cần nhập thêm hàng</p>
+            </div>
+        </div>
+
+        <!-- Out of Stock Card -->
+        <div class="p-6 rounded-[1.5rem] bg-white border border-brand-forest/5 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Hết hàng (0)</span>
+                <span class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                    <i class="ph ph-x-circle text-lg"></i>
+                </span>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-2xl font-mono font-extrabold text-brand-forest">@outOfStockCount <span class="text-xs font-sans font-normal">món</span></h3>
+                <p class="text-[10px] text-red-600 font-bold"><i class="ph ph-lock-simple"></i> Đang dừng bán</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Lists 2-Column Split -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Left: Recent Orders -->
+        <div class="p-6 rounded-[1.8rem] bg-white border border-brand-forest/5 shadow-sm space-y-6">
+            <div class="flex justify-between items-center border-b border-brand-forest/5 pb-4">
+                <h3 class="text-base font-bold text-brand-forest flex items-center gap-2">
+                    <i class="ph ph-clipboard-text text-lg"></i>
+                    <span>Đơn hàng gần đây</span>
+                </h3>
+                <span class="text-xs font-semibold text-gray-400">Xem tất cả</span>
+            </div>
+
+            @if (!recentOrders.Any())
+            {
+                <p class="text-xs text-gray-400 text-center py-6">Chưa có đơn hàng nào phát sinh.</p>
+            }
+            else
+            {
+                <div class="divide-y divide-brand-forest/5">
+                    @foreach (var order in recentOrders)
+                    {
+                        var statusClass = order.Status == "Pending" ? "bg-yellow-50 text-yellow-700" :
+                                           order.Status == "Processing" ? "bg-blue-50 text-blue-700" :
+                                           order.Status == "Shipped" ? "bg-indigo-50 text-indigo-700" :
+                                           order.Status == "Delivered" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700";
+                                           
+                        <div class="py-3 flex justify-between items-center gap-4 text-xs">
+                            <div class="space-y-0.5">
+                                <p class="font-bold text-brand-forest">#MUNCH-@order.Id.ToString("D5")</p>
+                                <p class="text-gray-400 text-[10px]">@order.OrderDate.ToString("dd/MM/yyyy HH:mm") · @order.CustomerName</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-mono font-bold text-brand-forest">@order.TotalAmount.ToString("N0") đ</span>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold @statusClass">@order.Status</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Right: Inventory Alert List -->
+        <div class="p-6 rounded-[1.8rem] bg-white border border-brand-forest/5 shadow-sm space-y-6">
+            <div class="flex justify-between items-center border-b border-brand-forest/5 pb-4">
+                <h3 class="text-base font-bold text-brand-forest flex items-center gap-2">
+                    <i class="ph ph-package text-lg text-yellow-600"></i>
+                    <span>Cảnh báo hết hàng</span>
+                </h3>
+                <a asp-controller="Snacks" asp-action="Index" class="text-xs font-semibold text-brand-coral hover:text-brand-coral/80 transition-colors">Xem kho</a>
+            </div>
+
+            @if (!warningProducts.Any())
+            {
+                <p class="text-xs text-brand-matcha text-center py-6">Không có sản phẩm nào sắp hết hàng. Rất tốt!</p>
+            }
+            else
+            {
+                <div class="divide-y divide-brand-forest/5">
+                    @foreach (var snack in warningProducts)
+                    {
+                        var stockClass = snack.StockQuantity == 0 ? "bg-red-50 text-red-700" : "bg-yellow-50 text-yellow-700";
+                        
+                        <div class="py-3 flex justify-between items-center gap-4 text-xs">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-brand-light flex-shrink-0">
+                                    <img src="@snack.ImageUrl" alt="@snack.Name" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="truncate">
+                                    <h4 class="font-bold text-brand-forest truncate max-w-[20ch]">@snack.Name</h4>
+                                    <p class="text-gray-400 text-[10px]">@snack.Category?.Name</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full font-bold @stockClass">Tồn: @snack.StockQuantity</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

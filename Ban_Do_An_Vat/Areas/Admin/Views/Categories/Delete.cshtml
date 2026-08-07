@@ -1,0 +1,48 @@
+@model Ban_Do_An_Vat.Models.Category
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<div class="max-w-xl mx-auto space-y-6 animate-fade-up">
+    <!-- Header -->
+    <div class="flex items-center gap-4">
+        <a asp-action="Index" class="w-10 h-10 rounded-full bg-white hover:bg-brand-forest/5 text-brand-forest flex items-center justify-center shadow-sm transition-colors border border-brand-forest/5">
+            <i class="ph ph-arrow-left-bold"></i>
+        </a>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-red-600">Xóa Danh Mục</h1>
+            <p class="text-xs text-gray-500 mt-0.5">Xác nhận xóa bỏ danh mục khỏi hệ thống.</p>
+        </div>
+    </div>
+
+    <!-- Confirm Panel -->
+    <div class="p-8 rounded-[1.8rem] bg-white border border-brand-forest/5 shadow-sm text-center space-y-6">
+        <div class="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-3xl mx-auto">
+            <i class="ph ph-warning-bold"></i>
+        </div>
+        
+        <div>
+            <h3 class="text-lg font-bold text-brand-forest">Bạn có chắc chắn muốn xóa danh mục này?</h3>
+            <p class="text-xs text-red-500 font-semibold mt-1">Lưu ý: Xóa danh mục có thể ảnh hưởng đến hiển thị của các sản phẩm thuộc danh mục này.</p>
+        </div>
+
+        <div class="bg-brand-light p-4 rounded-2xl text-left border border-brand-forest/5 space-y-2">
+            <div class="text-xs font-bold text-gray-400 uppercase">Thông tin danh mục</div>
+            <div class="font-bold text-brand-forest">@Model.Name</div>
+            <div class="text-xs text-gray-500">@Model.Description</div>
+        </div>
+
+        <form asp-action="Delete" method="post" class="flex gap-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            
+            <button type="submit" class="w-full bg-red-600 text-white font-bold py-3.5 rounded-full hover:bg-red-700 transition-all shadow-md shadow-red-200">
+                Xác nhận xóa
+            </button>
+            <a asp-action="Index" class="w-full text-center border border-brand-forest/10 text-brand-forest font-bold py-3.5 rounded-full hover:bg-brand-forest/5 transition-all">
+                Hủy bỏ
+            </a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Từ Chối Truy Cập";
+}
+
+<div class="max-w-md mx-auto my-24 px-6 text-center">
+    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-brand-forest/5">
+        <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ph ph-shield-warning text-4xl"></i>
+        </div>
+        
+        <h1 class="text-2xl font-extrabold text-brand-forest mb-3">Từ Chối Truy Cập</h1>
+        <p class="text-sm text-gray-500 mb-8">
+            Bạn không có quyền truy cập vào trang này. Khu vực này chỉ dành cho quản trị viên hệ thống.
+        </p>
+
+        <div class="flex flex-col gap-3">
+            <a asp-controller="Home" asp-action="Index" class="bg-brand-forest text-white font-bold py-3 rounded-full hover:bg-brand-matcha transition-colors">
+                Quay lại Trang Chủ
+            </a>
+            <a asp-action="Login" class="text-brand-matcha hover:text-brand-coral font-bold text-sm transition-colors py-2">
+                Đăng nhập bằng tài khoản khác
+            </a>
+        </div>
+    </div>
+</div>

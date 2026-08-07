@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tiệm Ăn Vặt Lành Mạnh</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            forest: '#0F2C1F',
+                            matcha: '#2D6A4F',
+                            coral: '#EA580C',
+                            amber: '#F7A072',
+                            bone: '#FAF9F6',
+                            dark: '#0F172A',
+                            light: '#F8FAFC'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Phosphor Icons (Local Offline-First) -->
+    <link rel="stylesheet" href="~/lib/phosphor-icons/src/style.css" asp-append-version="true" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Ban_Do_An_Vat.styles.css" asp-append-version="true" />
+</head>
+<body class="bg-brand-bone text-brand-dark min-h-screen flex flex-col">
+    <!-- Fixed Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Grain Noise Overlay -->
+    <div class="grain-noise"></div>
+
+    <!-- Premium Sticky Header Navigation -->
+    <header class="sticky top-0 z-40 glass-nav transition-all duration-300">
+        <nav class="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="flex items-center gap-2 group">
+                <img src="~/images/logo.png" alt="MUNCHIES Logo" class="h-8 w-auto object-contain transition-transform duration-500 group-hover:scale-105" asp-append-version="true" />
+                <span class="font-extrabold text-lg md:text-xl tracking-tight text-brand-forest">MUNCHIES</span>
+            </a>
+
+            <!-- Nav Links (Desktop) -->
+            <div class="hidden md:flex items-center gap-8">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="text-sm font-semibold hover:text-brand-coral transition-colors">Trang Chủ</a>
+                <a asp-area="" asp-controller="Snacks" asp-action="Index" class="text-sm font-semibold hover:text-brand-coral transition-colors">Cửa Hàng</a>
+                <a asp-area="" asp-controller="Combos" asp-action="Index" class="text-sm font-semibold hover:text-brand-coral transition-colors flex items-center gap-1">
+                    <i class="ph ph-lightning text-brand-coral"></i> Combo
+                </a>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-sm font-semibold hover:text-brand-coral transition-colors">Chính Sách</a>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center gap-4">
+                <!-- Cart Icon -->
+                <a asp-area="" asp-controller="Cart" asp-action="Index" class="relative p-2 rounded-full hover:bg-brand-forest/5 text-brand-forest transition-colors">
+                    <i class="ph ph-shopping-bag text-2xl"></i>
+                    <!-- Cart Counter Component -->
+                    <span id="cart-badge-count" class="absolute -top-1 -right-1 bg-brand-coral text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm hidden">0</span>
+                </a>
+
+                <!-- Identity Partial (Login / Register) -->
+                <partial name="_LoginPartial" />
+
+                <!-- Mobile Menu Button -->
+                <button type="button" class="md:hidden p-2 text-brand-forest" onclick="toggleMobileMenu()">
+                    <i id="mobile-menu-icon" class="ph ph-list text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation Panel -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-brand-forest/5 bg-brand-bone/95 backdrop-blur-md px-6 py-4 space-y-4">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="block text-base font-semibold py-2 border-b border-brand-forest/5" onclick="toggleMobileMenu()">Trang Chủ</a>
+            <a asp-area="" asp-controller="Snacks" asp-action="Index" class="block text-base font-semibold py-2 border-b border-brand-forest/5" onclick="toggleMobileMenu()">Cửa Hàng</a>
+            <a asp-area="" asp-controller="Combos" asp-action="Index" class="block text-base font-semibold py-2 border-b border-brand-forest/5 text-brand-coral" onclick="toggleMobileMenu()">
+                <i class="ph ph-lightning"></i> Combo Ưu Đãi
+            </a>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy" class="block text-base font-semibold py-2" onclick="toggleMobileMenu()">Chính Sách</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main role="main" class="flex-grow">
+        @RenderBody()
+    </main>
+
+    <!-- Premium Footer -->
+    <footer class="bg-brand-forest text-brand-bone border-t border-brand-bone/10 py-12 px-6 mt-20">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                    <img src="~/images/logo.png" alt="MUNCHIES Logo" class="h-8 w-auto object-contain" asp-append-version="true" />
+                    <span class="font-extrabold text-xl tracking-tight text-white">MUNCHIES</span>
+                </div>
+                <p class="text-sm text-brand-bone/70 max-w-xs leading-relaxed">
+                    Trải nghiệm ẩm thực ăn vặt sạch, chất lượng cao, đậm vị Việt, được đóng gói chỉnh chu và giao hàng nhanh chóng.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-xs uppercase tracking-widest font-bold text-brand-amber mb-4">Danh Mục</h4>
+                <ul class="space-y-2 text-sm text-brand-bone/80">
+                    <li><a asp-controller="Snacks" asp-action="Index" asp-route-category="1" class="hover:text-brand-coral transition-colors">Bánh Tráng & Khô</a></li>
+                    <li><a asp-controller="Snacks" asp-action="Index" asp-route-category="2" class="hover:text-brand-coral transition-colors">Hạt & Trái Cây Sấy</a></li>
+                    <li><a asp-controller="Snacks" asp-action="Index" asp-route-category="3" class="hover:text-brand-coral transition-colors">Bánh & Kẹo Ngọt</a></li>
+                    <li><a asp-controller="Snacks" asp-action="Index" asp-route-category="4" class="hover:text-brand-coral transition-colors">Ăn Vặt Hiện Đại</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs uppercase tracking-widest font-bold text-brand-amber mb-4">Hỗ Trợ</h4>
+                <ul class="space-y-2 text-sm text-brand-bone/80">
+                    <li><a href="#" class="hover:text-brand-coral transition-colors">Chính sách vận chuyển</a></li>
+                    <li><a href="#" class="hover:text-brand-coral transition-colors">Chính sách đổi trả</a></li>
+                    <li><a href="#" class="hover:text-brand-coral transition-colors">Liên hệ hợp tác</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="hover:text-brand-coral transition-colors">Quyền riêng tư</a></li>
+                </ul>
+            </div>
+            <div class="space-y-4">
+                <h4 class="text-xs uppercase tracking-widest font-bold text-brand-amber mb-4">Nhận Bản Tin</h4>
+                <p class="text-sm text-brand-bone/70">Đăng ký để nhận thông tin sản phẩm mới và khuyến mãi đặc biệt.</p>
+                <div class="flex gap-2">
+                    <input type="email" placeholder="Email của bạn" class="bg-brand-bone/10 border border-brand-bone/20 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-brand-coral text-white w-full" />
+                    <button class="w-10 h-10 rounded-full bg-brand-coral flex items-center justify-center hover:bg-brand-coral/80 transition-colors">
+                        <i class="ph-bold ph-paper-plane-tilt text-white text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-brand-bone/10 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-brand-bone/50 gap-4">
+            <p>&copy; @DateTime.Now.Year Munchies. All rights reserved. Crafted for visual excellence.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-white transition-colors"><i class="ph ph-facebook-logo text-lg"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="ph ph-instagram-logo text-lg"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="ph ph-tiktok-logo text-lg"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Core JS (Needed for validation/partial helpers if any) -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Global Cart Count Sync Script -->
+    <script>
+        function updateCartBadge() {
+            $.ajax({
+                url: '/Cart/GetTotalItems',
+                method: 'GET',
+                success: function (count) {
+                    var badge = $('#cart-badge-count');
+                    if (count > 0) {
+                        badge.text(count).removeClass('hidden');
+                    } else {
+                        badge.addClass('hidden');
+                    }
+                }
+            });
+        }
+        $(document).ready(function() {
+            updateCartBadge();
+        });
+
+        function toggleMobileMenu() {
+            var menu = $('#mobile-menu');
+            var icon = $('#mobile-menu-icon');
+            if (menu.hasClass('hidden')) {
+                menu.removeClass('hidden');
+                icon.removeClass('ph-list').addClass('ph-x');
+            } else {
+                menu.addClass('hidden');
+                icon.removeClass('ph-x').addClass('ph-list');
+            }
+        }
+    </script>
+
+    <!-- ===================== CHATBOT AI WIDGET ===================== -->
+    <style>
+        #chatbot-fab { transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        #chatbot-fab:hover { transform: scale(1.1); }
+        #chatbot-panel {
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            transform-origin: bottom right;
+        }
+        #chatbot-panel.panel-hidden { transform: scale(0.85) translateY(16px); opacity: 0; pointer-events: none; }
+        #chatbot-panel.panel-visible { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+        .chat-msg-user { background: #EA580C; color: white; border-radius: 18px 18px 4px 18px; }
+        .chat-msg-bot  { background: #F1F5F0; color: #0F2C1F; border-radius: 18px 18px 18px 4px; }
+        #chatbot-messages { scrollbar-width: thin; scrollbar-color: #2D6A4F22 transparent; }
+        .typing-dot { animation: typingBounce 1.2s infinite; background: #2D6A4F; border-radius: 50%; width:7px; height:7px; display:inline-block; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @@keyframes typingBounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    </style>
+
+    <!-- FAB Button -->
+    <button id="chatbot-fab"
+            onclick="toggleChat()"
+            aria-label="Mở chatbot AI"
+            class="fixed bottom-6 right-6 z-[9990] w-14 h-14 bg-brand-forest hover:bg-brand-matcha rounded-full shadow-2xl flex items-center justify-center text-white">
+        <i id="chatbot-fab-icon" class="ph ph-chat-circle-dots text-2xl"></i>
+    </button>
+
+    <!-- Chat Panel -->
+    <div id="chatbot-panel"
+         class="panel-hidden fixed bottom-24 right-6 z-[9989] w-[360px] max-w-[calc(100vw-24px)] bg-white rounded-3xl shadow-2xl border border-brand-forest/10 flex flex-col overflow-hidden"
+         style="height:520px;">
+
+        <!-- Panel Header -->
+        <div class="bg-brand-forest px-5 py-4 flex items-center gap-3 flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-brand-coral flex items-center justify-center shadow-md">
+                <i class="ph ph-robot text-white text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="text-white font-extrabold text-sm">Munchies AI</h4>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                    <p class="text-brand-bone/60 text-xs">Trực tuyến – hỏi về đồ ăn vặt nhé!</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="text-brand-bone/50 hover:text-white transition-colors p-1">
+                <i class="ph ph-x text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="chatbot-messages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-brand-bone/30">
+            <!-- Welcome message -->
+            <div class="flex items-start gap-2">
+                <div class="w-7 h-7 rounded-full bg-brand-forest flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i class="ph ph-robot text-white text-xs"></i>
+                </div>
+                <div class="chat-msg-bot text-sm px-4 py-3 max-w-[80%] leading-relaxed shadow-sm">
+                    Xin chào! Mình là Munchies AI 🍿 Bạn muốn biết gì về đồ ăn vặt hay combo ưu đãi của chúng mình?
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="px-4 py-3 border-t border-brand-forest/10 bg-white flex-shrink-0">
+            <div class="flex items-center gap-2 bg-brand-forest/5 rounded-2xl px-4 py-2">
+                <input id="chatbot-input"
+                       type="text"
+                       placeholder="Hỏi về đồ ăn vặt..."
+                       maxlength="500"
+                       class="flex-1 bg-transparent text-sm text-brand-forest placeholder-gray-400 focus:outline-none"
+                       onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendChat(); }" />
+                <button onclick="sendChat()"
+                        id="chatbot-send-btn"
+                        class="w-8 h-8 bg-brand-coral rounded-full flex items-center justify-center text-white hover:bg-brand-coral/80 transition-colors flex-shrink-0">
+                    <i class="ph-bold ph-paper-plane-tilt text-sm"></i>
+                </button>
+            </div>
+            <p class="text-center text-[10px] text-gray-400 mt-2">Powered by Gemini AI · Chỉ tư vấn về đồ ăn vặt</p>
+        </div>
+    </div>
+
+    <script>
+        var chatPanelOpen = false;
+        var chatIsSending = false;
+        var chatAntiForgeryToken = '@Html.AntiForgeryToken()'.match(/value="([^"]+)"/)?.[1] || '';
+
+        function toggleChat() {
+            chatPanelOpen = !chatPanelOpen;
+            var panel = document.getElementById('chatbot-panel');
+            var icon  = document.getElementById('chatbot-fab-icon');
+            if (chatPanelOpen) {
+                panel.classList.remove('panel-hidden');
+                panel.classList.add('panel-visible');
+                icon.className = 'ph ph-x text-2xl';
+                setTimeout(function() { document.getElementById('chatbot-input').focus(); }, 350);
+            } else {
+                panel.classList.remove('panel-visible');
+                panel.classList.add('panel-hidden');
+                icon.className = 'ph ph-chat-circle-dots text-2xl';
+            }
+        }
+
+        function appendMessage(text, isUser) {
+            var msgs = document.getElementById('chatbot-messages');
+            var wrapper = document.createElement('div');
+            wrapper.className = 'flex items-start gap-2' + (isUser ? ' justify-end' : '');
+
+            if (!isUser) {
+                var avatar = document.createElement('div');
+                avatar.className = 'w-7 h-7 rounded-full bg-brand-forest flex items-center justify-center flex-shrink-0 mt-0.5';
+                avatar.innerHTML = '<i class="ph ph-robot text-white text-xs"></i>';
+                wrapper.appendChild(avatar);
+            }
+
+            var bubble = document.createElement('div');
+            bubble.className = (isUser ? 'chat-msg-user' : 'chat-msg-bot') + ' text-sm px-4 py-3 max-w-[80%] leading-relaxed shadow-sm';
+            bubble.style.whiteSpace = 'pre-wrap';
+            bubble.textContent = text;
+            wrapper.appendChild(bubble);
+
+            msgs.appendChild(wrapper);
+            msgs.scrollTop = msgs.scrollHeight;
+            return bubble;
+        }
+
+        function showTyping() {
+            var msgs = document.getElementById('chatbot-messages');
+            var wrapper = document.createElement('div');
+            wrapper.id = 'typing-indicator';
+            wrapper.className = 'flex items-start gap-2';
+            wrapper.innerHTML = '<div class="w-7 h-7 rounded-full bg-brand-forest flex items-center justify-center flex-shrink-0 mt-0.5"><i class="ph ph-robot text-white text-xs"></i></div><div class="chat-msg-bot px-4 py-3 flex items-center gap-1.5"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+            msgs.appendChild(wrapper);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function hideTyping() {
+            var el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        function sendChat() {
+            if (chatIsSending) return;
+            var input = document.getElementById('chatbot-input');
+            var message = input.value.trim();
+            if (!message) return;
+
+            appendMessage(message, true);
+            input.value = '';
+            chatIsSending = true;
+            document.getElementById('chatbot-send-btn').disabled = true;
+            showTyping();
+
+            $.ajax({
+                url: '/Chatbot/Chat',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ message: message }),
+                headers: { 'RequestVerificationToken': chatAntiForgeryToken },
+                success: function(res) {
+                    hideTyping();
+                    if (res.success) {
+                        appendMessage(res.reply, false);
+                    } else {
+                        appendMessage('Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!', false);
+                    }
+                },
+                error: function() {
+                    hideTyping();
+                    appendMessage('Không thể kết nối. Vui lòng kiểm tra kết nối mạng!', false);
+                },
+                complete: function() {
+                    chatIsSending = false;
+                    document.getElementById('chatbot-send-btn').disabled = false;
+                    document.getElementById('chatbot-input').focus();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+@model Ban_Do_An_Vat.Controllers.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng Nhập";
+}
+
+<div class="max-w-md mx-auto my-16 px-6">
+    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-brand-forest/5">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-brand-forest">Đăng Nhập</h1>
+            <p class="text-sm text-gray-500 mt-2">Đăng nhập tài khoản Munchies của bạn.</p>
+        </div>
+
+        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="space-y-6">
+            <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm font-semibold mb-4"></div>
+
+            <div>
+                <label asp-for="Email" class="block text-sm font-semibold text-brand-forest mb-2">Email</label>
+                <input asp-for="Email" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="nhap@email.com" />
+                <span asp-validation-for="Email" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password" class="block text-sm font-semibold text-brand-forest mb-2">Mật khẩu</label>
+                <input asp-for="Password" type="password" class="w-full bg-brand-bone border border-brand-forest/10 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-matcha" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-red-500 text-xs mt-1 block"></span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                    <input asp-for="RememberMe" type="checkbox" class="rounded border-gray-300 text-brand-matcha focus:ring-brand-matcha w-4 h-4" />
+                    <span>Ghi nhớ đăng nhập</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-coral text-white font-bold py-3.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20">
+                Đăng Nhập
+            </button>
+        </form>
+
+        <div class="mt-8 text-center text-sm text-gray-500 border-t border-brand-forest/5 pt-6">
+            Chưa có tài khoản? 
+            <a asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-brand-matcha hover:text-brand-coral font-bold transition-colors">Đăng ký ngay</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
