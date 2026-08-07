@@ -1,0 +1,22 @@
+﻿# render.yaml cho Ban_Do_An_Vat
+# Tao 07/08/2026 - cap nhat branch master
+
+services:
+  - type: web
+    name: ban-do-an-vat
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    branch: master
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://neondb_owner:npg_3FORPdBsikN1@ep-blue-cell-axqvbg3f-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Momo__ReturnUrl
+        value: https://ban-do-an-vat.onrender.com/Cart/MomoCallback
+      - key: Momo__IpnUrl
+        value: https://ban-do-an-vat.onrender.com/Cart/MomoIpn
+      - key: Gemini__ApiKey
+        value: AQ.Ab8RN6Kah1rQLUToyDHbWKAqMdP0R5wQQ4BF3FEeXxrS9Wgrfg

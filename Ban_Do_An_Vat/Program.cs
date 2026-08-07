@@ -12,11 +12,34 @@ namespace Ban_Do_An_Vat
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            // ── DATABASE CONFIGURATION ────────────────────────────────────────────
+            // Dual-database: PostgreSQL (Neon) trên Render, SQL Server trên local.
+            // Thêm 07/08/2026 để hỗ trợ deploy lên Render + Neon.
+            //
+            // Cách hoạt động:
+            //   - Nếu tồn tại biến môi trường DATABASE_URL (Render/Neon) → dùng PostgreSQL
+            //   - Ngược lại → dùng DefaultConnection trong appsettings.json (SQL Server, local)
+            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            {
+                if (!string.IsNullOrEmpty(databaseUrl))
+                {
+                    // PostgreSQL cho Render/Neon production
+                    options.UseNpgsql(databaseUrl, npgsqlOptions =>
+                    {
+                        npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory");
+                    });
+                }
+                else
+                {
+                    // SQL Server cho local development (giữ nguyên như cũ)
+                    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                    options.UseSqlServer(connectionString);
+                }
+            });
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            // ─────────────────────────────────────────────────────────────────────
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.SignIn.RequireConfirmedAccount = false;
@@ -54,6 +77,18 @@ namespace Ban_Do_An_Vat
             });
 
             var app = builder.Build();
+
+            // ── AUTO-MIGRATE trên Production (Render) ────────────────────────────
+            // Tự động chạy migrations khi deploy lên Render, an toàn vì chỉ kích hoạt
+            // khi DATABASE_URL tồn tại. Local dev vẫn dùng lệnh thủ công.
+            // Thêm 07/08/2026
+            if (!string.IsNullOrEmpty(databaseUrl))
+            {
+                using var scope = app.Services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
+            }
+            // ─────────────────────────────────────────────────────────────────────
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
