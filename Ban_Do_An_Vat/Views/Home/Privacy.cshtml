@@ -1,6 +1,450 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+@{
+    ViewData["Title"] = "Chính Sách";
+    ViewData["Description"] = "Chính sách vận chuyển, đổi trả, bảo mật thông tin và thanh toán của Tiệm Ăn Vặt MUNCHIES.";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<style>
+    .policy-hero {
+        background: linear-gradient(135deg, #0F2C1F 0%, #2D6A4F 60%, #1a4535 100%);
+    }
+    .policy-card {
+        background: #fff;
+        border: 1px solid #0F2C1F10;
+        border-radius: 1.25rem;
+        transition: box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .policy-card:hover {
+        box-shadow: 0 12px 40px #0F2C1F12;
+        transform: translateY(-2px);
+    }
+    .policy-icon-wrap {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .policy-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #EA580C15;
+        color: #EA580C;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 99px;
+    }
+    .toc-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #0F2C1F;
+        transition: background 0.18s, color 0.18s;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+    }
+    .toc-link:hover {
+        background: #2D6A4F10;
+        color: #2D6A4F;
+    }
+    .highlight-box {
+        background: linear-gradient(135deg, #2D6A4F08, #EA580C06);
+        border-left: 3px solid #EA580C;
+        border-radius: 0 10px 10px 0;
+        padding: 14px 18px;
+    }
+    @@media (max-width: 768px) {
+        .policy-layout { flex-direction: column; }
+        .policy-sidebar { display: none; }
+    }
+</style>
+
+<!-- Hero Banner -->
+<section class="policy-hero py-16 px-6 text-white relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%); background-size: 20px 20px;"></div>
+    <div class="max-w-5xl mx-auto relative z-10 text-center">
+        <span class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-amber mb-4">
+            <i class="ph ph-shield-check"></i> MUNCHIES · Cam kết với khách hàng
+        </span>
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">Chính Sách Cửa Hàng</h1>
+        <p class="text-brand-bone/70 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+            Chúng mình cam kết mang lại trải nghiệm mua sắm minh bạch, an toàn và tiện lợi nhất cho mọi khách hàng.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 mt-8">
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
+                <i class="ph-fill ph-truck text-brand-amber"></i> Giao hàng nhanh
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
+                <i class="ph-fill ph-arrows-clockwise text-brand-amber"></i> Đổi trả dễ dàng
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
+                <i class="ph-fill ph-lock-key text-brand-amber"></i> Bảo mật thông tin
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
+                <i class="ph-fill ph-credit-card text-brand-amber"></i> Thanh toán an toàn
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="max-w-6xl mx-auto px-6 py-14 flex gap-10 policy-layout" id="policy-top">
+
+    <!-- Sidebar TOC (Desktop) -->
+    <aside class="policy-sidebar w-64 flex-shrink-0">
+        <div class="sticky top-24">
+            <div class="bg-white border border-brand-forest/8 rounded-2xl p-5 shadow-sm">
+                <p class="text-xs font-bold uppercase tracking-widest text-brand-matcha mb-4">Mục lục</p>
+                <nav class="space-y-1">
+                    <button class="toc-link" onclick="document.getElementById('shipping').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-truck text-blue-500 text-sm"></i></span>
+                        Vận chuyển
+                    </button>
+                    <button class="toc-link" onclick="document.getElementById('returns').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-arrows-clockwise text-green-600 text-sm"></i></span>
+                        Đổi trả & Hoàn tiền
+                    </button>
+                    <button class="toc-link" onclick="document.getElementById('payment').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-credit-card text-purple-500 text-sm"></i></span>
+                        Thanh toán
+                    </button>
+                    <button class="toc-link" onclick="document.getElementById('privacy').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-shield-check text-orange-500 text-sm"></i></span>
+                        Bảo mật thông tin
+                    </button>
+                    <button class="toc-link" onclick="document.getElementById('quality').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-yellow-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-star text-yellow-500 text-sm"></i></span>
+                        Chất lượng sản phẩm
+                    </button>
+                    <button class="toc-link" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+                        <span class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0"><i class="ph ph-headset text-red-500 text-sm"></i></span>
+                        Liên hệ hỗ trợ
+                    </button>
+                </nav>
+                <div class="mt-5 pt-4 border-t border-brand-forest/8 text-[11px] text-gray-400 leading-relaxed">
+                    Cập nhật lần cuối: <strong class="text-gray-600">07/08/2026</strong>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Policy Content -->
+    <div class="flex-1 space-y-8 min-w-0">
+
+        <!-- 1. Vận chuyển -->
+        <div id="shipping" class="policy-card p-7 scroll-mt-28">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-blue-50">
+                    <i class="ph-fill ph-truck text-blue-500 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="policy-tag"><i class="ph ph-tag-chevron"></i> Mục 1</span>
+                    <h2 class="text-xl font-extrabold text-brand-forest mt-1">Chính Sách Vận Chuyển</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-blue-50 rounded-xl p-4 text-center">
+                    <i class="ph ph-clock text-blue-500 text-2xl mb-2"></i>
+                    <p class="font-bold text-brand-forest text-sm">1 – 3 ngày</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Nội thành TP.HCM</p>
+                </div>
+                <div class="bg-blue-50 rounded-xl p-4 text-center">
+                    <i class="ph ph-calendar-blank text-blue-500 text-2xl mb-2"></i>
+                    <p class="font-bold text-brand-forest text-sm">3 – 7 ngày</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Tỉnh thành khác</p>
+                </div>
+                <div class="bg-green-50 rounded-xl p-4 text-center">
+                    <i class="ph ph-gift text-green-500 text-2xl mb-2"></i>
+                    <p class="font-bold text-brand-forest text-sm">Miễn phí</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Đơn hàng trên 150.000đ</p>
+                </div>
+            </div>
+
+            <ul class="space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-check-circle text-green-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Đối tác vận chuyển: <strong>GHTK, GHN, Ninja Van</strong> — đảm bảo hàng nguyên vẹn, không bị móp méo.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-check-circle text-green-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Phí vận chuyển: <strong>20.000đ</strong> cho đơn dưới 150.000đ. Đơn từ 150.000đ trở lên được <strong class="text-brand-coral">miễn phí ship</strong>.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-check-circle text-green-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Đơn hàng được xử lý trong <strong>vòng 2 giờ</strong> sau khi xác nhận thanh toán (giờ hành chính).</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-check-circle text-green-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Khách hàng nhận được <strong>mã vận đơn</strong> qua email/SMS để theo dõi đơn hàng theo thời gian thực.</span>
+                </li>
+            </ul>
+
+            <div class="highlight-box mt-5">
+                <p class="text-sm text-gray-700"><strong class="text-brand-coral">Lưu ý:</strong> Thời gian giao hàng có thể kéo dài hơn vào các dịp Lễ, Tết hoặc thời tiết xấu. Chúng mình sẽ thông báo trước qua email.</p>
+            </div>
+        </div>
+
+        <!-- 2. Đổi trả -->
+        <div id="returns" class="policy-card p-7 scroll-mt-28">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-green-50">
+                    <i class="ph-fill ph-arrows-clockwise text-green-600 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="policy-tag"><i class="ph ph-tag-chevron"></i> Mục 2</span>
+                    <h2 class="text-xl font-extrabold text-brand-forest mt-1">Chính Sách Đổi Trả & Hoàn Tiền</h2>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-5 leading-relaxed">
+                MUNCHIES cam kết chịu trách nhiệm 100% với chất lượng sản phẩm. Nếu có bất kỳ vấn đề nào, chúng mình sẽ giải quyết trong vòng <strong>24 giờ làm việc</strong>.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="border border-green-200 rounded-xl p-4 bg-green-50/50">
+                    <h3 class="font-bold text-brand-forest text-sm mb-3 flex items-center gap-2"><i class="ph ph-check text-green-600"></i> Được đổi trả khi</h3>
+                    <ul class="space-y-2 text-xs text-gray-700">
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-green-500"></i> Sản phẩm bị hỏng, vỡ, biến dạng khi nhận</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-green-500"></i> Sản phẩm bị ẩm mốc, mùi lạ, hết hạn sử dụng</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-green-500"></i> Giao nhầm sản phẩm so với đơn hàng</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-green-500"></i> Thiếu số lượng so với đơn hàng đã đặt</li>
+                    </ul>
+                </div>
+                <div class="border border-red-200 rounded-xl p-4 bg-red-50/50">
+                    <h3 class="font-bold text-brand-forest text-sm mb-3 flex items-center gap-2"><i class="ph ph-x text-red-500"></i> Không được đổi trả khi</h3>
+                    <ul class="space-y-2 text-xs text-gray-700">
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-x-circle text-red-400"></i> Sản phẩm đã được mở và sử dụng một phần</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-x-circle text-red-400"></i> Đã qua 48 giờ kể từ khi nhận hàng</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-x-circle text-red-400"></i> Sản phẩm hư do lỗi bảo quản của khách hàng</li>
+                        <li class="flex items-center gap-2"><i class="ph-fill ph-x-circle text-red-400"></i> Không có hình ảnh/video bằng chứng kèm theo</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-brand-forest/4 rounded-xl p-5">
+                <h3 class="font-bold text-brand-forest text-sm mb-3">Quy trình đổi trả (3 bước đơn giản)</h3>
+                <div class="flex flex-col md:flex-row gap-3">
+                    <div class="flex-1 text-center">
+                        <div class="w-8 h-8 rounded-full bg-brand-coral text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">1</div>
+                        <p class="text-xs text-gray-700 font-medium">Chụp ảnh/quay video sản phẩm lỗi</p>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-300 hidden md:flex"><i class="ph ph-arrow-right text-xl"></i></div>
+                    <div class="flex-1 text-center">
+                        <div class="w-8 h-8 rounded-full bg-brand-coral text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">2</div>
+                        <p class="text-xs text-gray-700 font-medium">Liên hệ CSKH qua Zalo/Email kèm hình ảnh</p>
+                    </div>
+                    <div class="flex items-center justify-center text-gray-300 hidden md:flex"><i class="ph ph-arrow-right text-xl"></i></div>
+                    <div class="flex-1 text-center">
+                        <div class="w-8 h-8 rounded-full bg-brand-coral text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">3</div>
+                        <p class="text-xs text-gray-700 font-medium">Nhận hàng mới hoặc hoàn tiền trong 24h</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Thanh toán -->
+        <div id="payment" class="policy-card p-7 scroll-mt-28">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-purple-50">
+                    <i class="ph-fill ph-credit-card text-purple-500 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="policy-tag"><i class="ph ph-tag-chevron"></i> Mục 3</span>
+                    <h2 class="text-xl font-extrabold text-brand-forest mt-1">Chính Sách Thanh Toán</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="border border-gray-100 rounded-xl p-3 text-center hover:border-brand-coral/30 transition-colors">
+                    <i class="ph ph-money text-brand-forest text-xl mb-1"></i>
+                    <p class="text-xs font-semibold text-gray-700">Tiền mặt</p>
+                    <p class="text-[10px] text-gray-400">COD khi nhận</p>
+                </div>
+                <div class="border border-gray-100 rounded-xl p-3 text-center hover:border-brand-coral/30 transition-colors">
+                    <i class="ph ph-qr-code text-brand-forest text-xl mb-1"></i>
+                    <p class="text-xs font-semibold text-gray-700">VietQR</p>
+                    <p class="text-[10px] text-gray-400">Chuyển khoản MB</p>
+                </div>
+                <div class="border border-gray-100 rounded-xl p-3 text-center hover:border-brand-coral/30 transition-colors">
+                    <i class="ph ph-device-mobile text-brand-forest text-xl mb-1"></i>
+                    <p class="text-xs font-semibold text-gray-700">MoMo</p>
+                    <p class="text-[10px] text-gray-400">Ví điện tử</p>
+                </div>
+                <div class="border border-gray-100 rounded-xl p-3 text-center hover:border-brand-coral/30 transition-colors">
+                    <i class="ph ph-credit-card text-brand-forest text-xl mb-1"></i>
+                    <p class="text-xs font-semibold text-gray-700">Thẻ ngân hàng</p>
+                    <p class="text-[10px] text-gray-400">Nội địa / Quốc tế</p>
+                </div>
+            </div>
+
+            <ul class="space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-shield-check text-purple-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Tất cả giao dịch trực tuyến đều được <strong>mã hóa SSL 256-bit</strong>, đảm bảo an toàn tuyệt đối.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-shield-check text-purple-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>MUNCHIES <strong>không lưu trữ thông tin thẻ</strong> thanh toán của khách hàng trên hệ thống.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-shield-check text-purple-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Đơn hàng thanh toán online được ưu tiên xử lý và xác nhận trong <strong>vòng 15 phút</strong>.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="ph-fill ph-shield-check text-purple-500 text-lg flex-shrink-0 mt-0.5"></i>
+                    <span>Hoàn tiền qua hình thức gốc trong <strong>3 – 7 ngày làm việc</strong> tùy ngân hàng.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 4. Bảo mật -->
+        <div id="privacy" class="policy-card p-7 scroll-mt-28">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-orange-50">
+                    <i class="ph-fill ph-shield-check text-orange-500 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="policy-tag"><i class="ph ph-tag-chevron"></i> Mục 4</span>
+                    <h2 class="text-xl font-extrabold text-brand-forest mt-1">Chính Sách Bảo Mật Thông Tin</h2>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-5 leading-relaxed">
+                MUNCHIES hiểu rằng quyền riêng tư là điều quan trọng với bạn. Chúng mình cam kết bảo vệ thông tin cá nhân của khách hàng theo đúng quy định của pháp luật Việt Nam.
+            </p>
+
+            <div class="space-y-4">
+                <div class="border-l-2 border-orange-300 pl-4">
+                    <h3 class="font-bold text-brand-forest text-sm mb-1">Thông tin chúng mình thu thập</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">Họ tên, email, số điện thoại, địa chỉ giao hàng — chỉ dùng để xử lý đơn hàng và liên hệ khách hàng.</p>
+                </div>
+                <div class="border-l-2 border-orange-300 pl-4">
+                    <h3 class="font-bold text-brand-forest text-sm mb-1">Mục đích sử dụng thông tin</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">Xác nhận đơn hàng, thông báo vận chuyển, gửi ưu đãi (nếu bạn đồng ý). Chúng mình <strong>không bán</strong> thông tin cho bên thứ ba.</p>
+                </div>
+                <div class="border-l-2 border-orange-300 pl-4">
+                    <h3 class="font-bold text-brand-forest text-sm mb-1">Quyền của khách hàng</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">Bạn có quyền yêu cầu xem, chỉnh sửa hoặc xóa thông tin cá nhân bất kỳ lúc nào bằng cách liên hệ với chúng mình.</p>
+                </div>
+                <div class="border-l-2 border-orange-300 pl-4">
+                    <h3 class="font-bold text-brand-forest text-sm mb-1">Bảo mật dữ liệu</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed">Dữ liệu được lưu trữ trên máy chủ bảo mật, mã hóa. Mật khẩu được hash theo chuẩn bcrypt — ngay cả chúng mình cũng không đọc được.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Chất lượng -->
+        <div id="quality" class="policy-card p-7 scroll-mt-28">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-yellow-50">
+                    <i class="ph-fill ph-star text-yellow-500 text-2xl"></i>
+                </div>
+                <div>
+                    <span class="policy-tag"><i class="ph ph-tag-chevron"></i> Mục 5</span>
+                    <h2 class="text-xl font-extrabold text-brand-forest mt-1">Cam Kết Chất Lượng Sản Phẩm</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-seal-check text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-brand-forest">Nguồn gốc rõ ràng</p>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">100% nguyên liệu có nguồn gốc xuất xứ minh bạch, ưu tiên nguyên liệu Việt Nam chất lượng cao.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-thermometer text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-brand-forest">Bảo quản đúng chuẩn</p>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">Sản phẩm được bảo quản trong kho thoáng mát, đóng gói kín khí trước khi giao.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-calendar-check text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-brand-forest">Còn hạn sử dụng tối thiểu</p>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">Chỉ xuất hàng còn ít nhất <strong>70% thời gian sử dụng</strong>. Hàng gần hết hạn sẽ được thông báo rõ.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                        <i class="ph ph-package text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-sm text-brand-forest">Đóng gói cẩn thận</p>
+                        <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">Dùng túi bong bóng, hộp carton cứng để đảm bảo sản phẩm không bị vỡ vụn khi vận chuyển.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Liên hệ -->
+        <div id="contact" class="policy-card p-7 scroll-mt-28 bg-gradient-to-br from-brand-forest to-brand-matcha text-white border-0">
+            <div class="flex items-start gap-4 mb-6">
+                <div class="policy-icon-wrap bg-white/15">
+                    <i class="ph-fill ph-headset text-white text-2xl"></i>
+                </div>
+                <div>
+                    <span class="inline-flex items-center gap-1 bg-white/15 text-white/80 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-1">Mục 6</span>
+                    <h2 class="text-xl font-extrabold">Liên Hệ Hỗ Trợ</h2>
+                </div>
+            </div>
+
+            <p class="text-white/70 text-sm mb-6 leading-relaxed">
+                Đội ngũ CSKH của MUNCHIES luôn sẵn sàng hỗ trợ bạn từ <strong class="text-white">8:00 – 22:00</strong> mỗi ngày, kể cả cuối tuần.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="mailto:support@munchies.vn" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-colors group">
+                    <i class="ph ph-envelope-simple text-brand-amber text-xl group-hover:scale-110 transition-transform"></i>
+                    <div>
+                        <p class="text-xs text-white/60">Email</p>
+                        <p class="font-semibold text-sm text-white">support@munchies.vn</p>
+                    </div>
+                </a>
+                <a href="https://zalo.me/munchies" class="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl p-4 transition-colors group">
+                    <i class="ph ph-chat-teardrop-dots text-brand-amber text-xl group-hover:scale-110 transition-transform"></i>
+                    <div>
+                        <p class="text-xs text-white/60">Zalo OA</p>
+                        <p class="font-semibold text-sm text-white">Munchies Snack Store</p>
+                    </div>
+                </a>
+                <div class="flex items-center gap-3 bg-white/10 rounded-xl p-4">
+                    <i class="ph ph-map-pin text-brand-amber text-xl"></i>
+                    <div>
+                        <p class="text-xs text-white/60">Địa chỉ</p>
+                        <p class="font-semibold text-sm text-white">123 Đường Ăn Vặt, TP.HCM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-5 border-t border-white/15 text-center">
+                <p class="text-white/50 text-xs">Hoặc chat trực tiếp ngay bây giờ với</p>
+                <button onclick="toggleChat()" class="mt-2 inline-flex items-center gap-2 bg-brand-coral hover:bg-brand-amber text-white font-bold text-sm px-6 py-2.5 rounded-full transition-colors">
+                    <i class="ph ph-robot"></i> Munchies AI Chatbot
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
