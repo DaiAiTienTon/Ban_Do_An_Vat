@@ -65,7 +65,7 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                     combo.ImageUrl = "/uploads/" + fileName;
                 }
 
-                combo.CreatedAt = DateTime.Now;
+                combo.CreatedAt = DateTime.UtcNow;
                 _context.Combos.Add(combo);
                 await _context.SaveChangesAsync();
 

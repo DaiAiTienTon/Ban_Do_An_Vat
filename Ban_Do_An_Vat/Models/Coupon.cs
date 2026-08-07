@@ -26,7 +26,7 @@ namespace Ban_Do_An_Vat.Models
         public decimal MinOrderAmount { get; set; } = 0; // Minimum order value required to use this coupon
 
         [Required]
-        public DateTime ExpiryDate { get; set; } = DateTime.Now.AddDays(7);
+        public DateTime ExpiryDate { get; set; } = DateTime.UtcNow.AddDays(7);
 
         public bool IsActive { get; set; } = true;
     }

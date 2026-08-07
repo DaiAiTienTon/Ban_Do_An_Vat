@@ -36,7 +36,7 @@ namespace Ban_Do_An_Vat.Models
         [Display(Name = "Đang bán")]
         public bool IsAvailable { get; set; } = true;
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation
         public ICollection<ComboItem> ComboItems { get; set; } = new List<ComboItem>();

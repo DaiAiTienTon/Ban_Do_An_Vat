@@ -63,7 +63,7 @@ namespace Ban_Do_An_Vat.Controllers
             var couponCode = HttpContext.Session.GetString("AppliedCoupon");
             if (!string.IsNullOrEmpty(couponCode))
             {
-                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.Now);
+                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.UtcNow);
                 if (coupon != null)
                 {
                     if (cartTotal >= coupon.MinOrderAmount)
@@ -245,7 +245,7 @@ namespace Ban_Do_An_Vat.Controllers
                 var couponCode = HttpContext.Session.GetString("AppliedCoupon");
                 if (!string.IsNullOrEmpty(couponCode))
                 {
-                    var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.Now);
+                    var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.UtcNow);
                     if (coupon != null)
                     {
                         if (cartTotal >= coupon.MinOrderAmount)
@@ -344,7 +344,7 @@ namespace Ban_Do_An_Vat.Controllers
             var couponCode = HttpContext.Session.GetString("AppliedCoupon");
             if (!string.IsNullOrEmpty(couponCode))
             {
-                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.Now);
+                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.UtcNow);
                 if (coupon != null && cartTotal >= coupon.MinOrderAmount)
                 {
                     if (coupon.DiscountType == "Percentage")
@@ -394,7 +394,7 @@ namespace Ban_Do_An_Vat.Controllers
             var couponCode = HttpContext.Session.GetString("AppliedCoupon");
             if (!string.IsNullOrEmpty(couponCode))
             {
-                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.Now);
+                var coupon = _context.Coupons.FirstOrDefault(c => c.Code == couponCode && c.IsActive && c.ExpiryDate >= DateTime.UtcNow);
                 if (coupon != null && cartTotal >= coupon.MinOrderAmount)
                 {
                     if (coupon.DiscountType == "Percentage")
@@ -413,7 +413,7 @@ namespace Ban_Do_An_Vat.Controllers
 
             if (ModelState.IsValid)
             {
-                order.OrderDate = DateTime.Now;
+                order.OrderDate = DateTime.UtcNow;
                 order.TotalAmount = grandTotal;
                 order.DiscountAmount = discount;
                 order.Status = "Pending";
@@ -647,7 +647,7 @@ namespace Ban_Do_An_Vat.Controllers
                 return Json(new { success = false, message = "Mã giảm giá không tồn tại." });
             }
 
-            if (!coupon.IsActive || coupon.ExpiryDate < DateTime.Now)
+            if (!coupon.IsActive || coupon.ExpiryDate < DateTime.UtcNow)
             {
                 return Json(new { success = false, message = "Mã giảm giá đã hết hạn hoặc không khả dụng." });
             }
