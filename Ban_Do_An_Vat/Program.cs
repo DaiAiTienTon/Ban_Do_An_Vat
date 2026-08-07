@@ -24,8 +24,11 @@ namespace Ban_Do_An_Vat
             {
                 // PostgreSQL cho Render/Neon production — dùng ApplicationDbContextPostgres
                 // có migrations riêng trong Data/MigrationsPostgres/
+                // Fix 07/08/2026: Neon cấp URI format (postgresql://...) nhưng Npgsql cần
+                // key-value format → dùng ConvertPostgresUrlToNpgsql() để convert
+                var npgsqlConnStr = ConvertPostgresUrlToNpgsql(databaseUrl);
                 builder.Services.AddDbContext<ApplicationDbContext, ApplicationDbContextPostgres>(options =>
-                    options.UseNpgsql(databaseUrl));
+                    options.UseNpgsql(npgsqlConnStr));
             }
             else
             {
@@ -118,5 +121,25 @@ namespace Ban_Do_An_Vat
 
             app.Run();
         }
+
+        // ── HELPER: Convert PostgreSQL URI → Npgsql connection string ────────
+        // Neon cấp connection string dạng URI:
+        //   postgresql://user:pass@host/db?sslmode=require&channel_binding=require
+        // Npgsql cần dạng key-value:
+        //   Host=...;Database=...;Username=...;Password=...;SSL Mode=Require
+        // Thêm 07/08/2026 để fix lỗi NpgsqlConnectionStringBuilder không nhận URI
+        private static string ConvertPostgresUrlToNpgsql(string databaseUrl)
+        {
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = Uri.UnescapeDataString(userInfo[0]);
+            var password = Uri.UnescapeDataString(userInfo[1]);
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+
+            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        }
+        // ─────────────────────────────────────────────────────────────────────
     }
 }
