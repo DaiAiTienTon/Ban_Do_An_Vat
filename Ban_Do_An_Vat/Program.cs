@@ -20,24 +20,21 @@ namespace Ban_Do_An_Vat
             //   - Nếu tồn tại biến môi trường DATABASE_URL (Render/Neon) → dùng PostgreSQL
             //   - Ngược lại → dùng DefaultConnection trong appsettings.json (SQL Server, local)
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            if (!string.IsNullOrEmpty(databaseUrl))
             {
-                if (!string.IsNullOrEmpty(databaseUrl))
-                {
-                    // PostgreSQL cho Render/Neon production
-                    options.UseNpgsql(databaseUrl, npgsqlOptions =>
-                    {
-                        npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory");
-                    });
-                }
-                else
-                {
-                    // SQL Server cho local development (giữ nguyên như cũ)
-                    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-                    options.UseSqlServer(connectionString);
-                }
-            });
+                // PostgreSQL cho Render/Neon production — dùng ApplicationDbContextPostgres
+                // có migrations riêng trong Data/MigrationsPostgres/
+                builder.Services.AddDbContext<ApplicationDbContext, ApplicationDbContextPostgres>(options =>
+                    options.UseNpgsql(databaseUrl));
+            }
+            else
+            {
+                // SQL Server cho local development — giữ nguyên như cũ
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             // ─────────────────────────────────────────────────────────────────────
 
