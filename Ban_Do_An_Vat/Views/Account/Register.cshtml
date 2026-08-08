@@ -3,8 +3,9 @@
     ViewData["Title"] = "Đăng Ký";
 }
 
-<div class="max-w-md mx-auto my-16 px-6">
-    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-brand-forest/5">
+<div class="max-w-md mx-auto my-16 px-6 animate-fade-up">
+    <div class="outer-shell">
+        <div class="inner-core p-8 md:p-10">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-extrabold text-brand-forest">Đăng Ký</h1>
             <p class="text-sm text-gray-500 mt-2">Tạo tài khoản Munchies của bạn hôm nay.</p>
@@ -49,14 +50,18 @@
                 <span asp-validation-for="ConfirmPassword" class="text-red-500 text-xs mt-1 block"></span>
             </div>
 
-            <button type="submit" class="w-full bg-brand-coral text-white font-bold py-3.5 rounded-full hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20 mt-2">
-                Đăng Ký Tài Khoản
+            <button type="submit" class="btn-premium btn-premium-primary w-full mt-2 text-base py-3.5">
+                <span>Đăng Ký Tài Khoản</span>
+                <div class="btn-icon-wrapper">
+                    <i class="ph-bold ph-arrow-right text-sm"></i>
+                </div>
             </button>
         </form>
 
         <div class="mt-8 text-center text-sm text-gray-500 border-t border-brand-forest/5 pt-6">
             Đã có tài khoản? 
             <a asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="text-brand-matcha hover:text-brand-coral font-bold transition-colors">Đăng nhập</a>
+        </div>
         </div>
     </div>
 </div>

@@ -3,7 +3,7 @@
     ViewData["Title"] = "Đơn Hàng Của Tôi";
 }
 
-<div class="max-w-7xl mx-auto px-6 py-12">
+<div class="max-w-7xl mx-auto px-6 py-12 animate-fade-up">
     <div class="mb-8">
         <h1 class="text-3xl font-extrabold text-brand-forest">Đơn Hàng Của Tôi</h1>
         <p class="text-brand-forest/60 mt-2">Theo dõi trạng thái các đơn hàng bạn đã đặt.</p>
@@ -11,22 +11,25 @@
 
     @if (!Model.Any())
     {
-        <div class="bg-white rounded-3xl p-12 text-center shadow-sm border border-brand-forest/5">
-            <div class="w-24 h-24 bg-brand-forest/5 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-forest">
-                <i class="ph ph-package text-4xl"></i>
+        <div class="outer-shell">
+            <div class="inner-core p-12 text-center">
+                <div class="w-24 h-24 bg-brand-forest/5 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-forest">
+                    <i class="ph ph-package text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-forest mb-2">Bạn chưa có đơn hàng nào</h3>
+                <p class="text-brand-forest/60 mb-6">Hãy khám phá các món ăn vặt thơm ngon của chúng tôi nhé!</p>
+                <a asp-controller="Snacks" asp-action="Index" class="btn-premium btn-premium-primary text-base">
+                    <span>Mua sắm ngay</span>
+                    <div class="btn-icon-wrapper"><i class="ph-bold ph-arrow-right text-sm"></i></div>
+                </a>
             </div>
-            <h3 class="text-xl font-bold text-brand-forest mb-2">Bạn chưa có đơn hàng nào</h3>
-            <p class="text-brand-forest/60 mb-6">Hãy khám phá các món ăn vặt thơm ngon của chúng tôi nhé!</p>
-            <a asp-controller="Snacks" asp-action="Index" class="inline-flex items-center gap-2 bg-brand-coral text-white px-8 py-3 rounded-full font-bold hover:bg-brand-coral/90 transition-all shadow-md shadow-brand-coral/20">
-                <span>Mua sắm ngay</span>
-                <i class="ph ph-arrow-right font-bold"></i>
-            </a>
         </div>
     }
     else
     {
-        <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-brand-forest/5">
-            <div class="overflow-x-auto">
+        <div class="outer-shell">
+            <div class="inner-core p-0 overflow-hidden">
+                <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-brand-bone text-brand-forest text-sm uppercase tracking-wider">
@@ -73,6 +76,7 @@
                         }
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     }

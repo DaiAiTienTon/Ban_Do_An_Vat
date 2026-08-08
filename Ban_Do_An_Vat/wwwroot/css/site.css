@@ -1,13 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: 'Bricolage Grotesque', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
     
     --brand-forest: #0F2C1F;
     --brand-matcha: #2D6A4F;
-    --brand-coral: #EA580C;
-    --brand-amber: #F7A072;
+    --brand-coral: #E04D00; /* Adjusted for WCAG AA 4.5:1 contrast with white text */
+    --brand-amber: #FF8F44;
     --brand-bone: #FAF9F6;
     --brand-dark: #0F172A;
     --brand-light: #F8FAFC;
@@ -25,7 +26,20 @@ body {
     background-color: var(--brand-bone);
     color: var(--brand-dark);
     overflow-x: hidden;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
+    line-height: 1.6; /* Tối ưu measure 45-75ch */
+}
+
+h1, h2, h3, h4, .font-extrabold {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--brand-coral);
+    outline-offset: 4px;
+    border-radius: 4px;
 }
 
 /* Custom Scrollbar */
