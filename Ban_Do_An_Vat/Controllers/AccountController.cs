@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Ban_Do_An_Vat.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Ban_Do_An_Vat.Controllers
 {
@@ -70,15 +71,22 @@ namespace Ban_Do_An_Vat.Controllers
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")] // [SEC-05] Tối đa 10 lần / 15 phút mỗi IP
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                // [SEC-04] lockoutOnFailure: true — khóa tài khoản sau 5 lần nhập sai
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     return RedirectToLocal(returnUrl);
+                }
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "Tài khoản tạm thời bị khóa do nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.");
+                    return View(model);
                 }
                 ModelState.AddModelError(string.Empty, "Thông tin đăng nhập không hợp lệ.");
             }

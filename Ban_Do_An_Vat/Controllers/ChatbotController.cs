@@ -3,6 +3,7 @@ using Ban_Do_An_Vat.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Ban_Do_An_Vat.Controllers
 {
@@ -19,6 +20,7 @@ namespace Ban_Do_An_Vat.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("chatbot")] // [SEC-05] Tối đa 20 req/phút mỗi IP — bảo vệ Gemini API cost
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
             if (string.IsNullOrWhiteSpace(request?.Message))

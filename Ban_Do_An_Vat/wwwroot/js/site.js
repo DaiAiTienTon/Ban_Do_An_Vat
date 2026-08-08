@@ -47,3 +47,25 @@ function showToast(message, type = 'success') {
         });
     }, 3000);
 }
+
+// [UX-03] Newsletter signup handler
+function handleNewsletter(e) {
+    e.preventDefault();
+    var emailInput = document.getElementById('newsletter-email');
+    var email = emailInput ? emailInput.value.trim() : '';
+    var atSign = String.fromCharCode(64);
+    var atIdx = email.indexOf(atSign);
+    var isValid = email.length > 3 && atIdx > 0 && email.indexOf('.', atIdx) > atIdx + 1;
+    if (!isValid) {
+        showToast('Vui lòng nhập email hợp lệ.', 'error');
+        return;
+    }
+    showToast('Cảm ơn! Tính năng đăng ký bản tin sẽ sớm ra mắt 🎉', 'success');
+    if (emailInput) emailInput.value = '';
+}
+
+// [UX-04] Show "coming soon" toast for unbuilt footer links
+function showComingSoon(el) {
+    var label = el && el.textContent ? el.textContent.trim() : 'Tính năng';
+    showToast(label + ' đang được xây dựng. Sắp ra mắt! 🚧', 'info');
+}

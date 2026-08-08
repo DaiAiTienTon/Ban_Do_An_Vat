@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ban_Do_An_Vat.Services;
 using Ban_Do_An_Vat.Models;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace Ban_Do_An_Vat
 {
@@ -47,13 +49,19 @@ namespace Ban_Do_An_Vat
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             // ─────────────────────────────────────────────────────────────────────
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                // [SEC-04] Mật khẩu yêu cầu tối thiểu: 8 ký tự, có số
                 options.SignIn.RequireConfirmedAccount = false;
-                options.Password.RequireDigit = false;
+                options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 4;
+                options.Password.RequiredLength = 8;
+                // [SEC-04] Khóa tài khoản sau 5 lần nhập sai trong 15 phút
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.AllowedForNewUsers = true;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -71,6 +79,28 @@ namespace Ban_Do_An_Vat
 
             // AI Chatbot Service
             builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+
+            // [SEC-05] Rate Limiting — ngăn brute-force đăng nhập và lạm dụng chatbot AI
+            builder.Services.AddRateLimiter(options =>
+            {
+                // Login: tối đa 10 lần / 15 phút mỗi IP
+                options.AddFixedWindowLimiter("login", cfg =>
+                {
+                    cfg.Window = TimeSpan.FromMinutes(15);
+                    cfg.PermitLimit = 10;
+                    cfg.QueueLimit = 0;
+                    cfg.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+                // Chatbot: tối đa 20 request / phút mỗi IP (bảo vệ Gemini API cost)
+                options.AddFixedWindowLimiter("chatbot", cfg =>
+                {
+                    cfg.Window = TimeSpan.FromMinutes(1);
+                    cfg.PermitLimit = 20;
+                    cfg.QueueLimit = 0;
+                    cfg.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                });
+                options.RejectionStatusCode = 429;
+            });
 
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
@@ -111,9 +141,23 @@ namespace Ban_Do_An_Vat
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            // [SEC-08] Security headers — ngăn clickjacking, MIME sniffing, referrer leak
+            app.Use(async (ctx, next) =>
+            {
+                ctx.Response.Headers["X-Frame-Options"] = "DENY";
+                ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                ctx.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+                ctx.Response.Headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()";
+                await next();
+            });
+
             app.UseRouting();
+            // [SEC-05] Rate limiting middleware — phải được gọn trước UseAuthentication
+            app.UseRateLimiter();
             app.UseSession();
 
+            // [SEC-07] UseAuthentication() phải được gọi tường minh trước UseAuthorization()
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

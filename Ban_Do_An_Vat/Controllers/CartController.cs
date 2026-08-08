@@ -476,6 +476,9 @@ namespace Ban_Do_An_Vat.Controllers
                     if (momoResponse != null && momoResponse.ResultCode == 0 && !string.IsNullOrEmpty(momoResponse.PayUrl))
                     {
                         HttpContext.Session.Remove(CartSessionKey);
+                        // [SEC-03] Lưu orderId vào session cho guest checkout
+                        if (order.UserId == null)
+                            HttpContext.Session.SetInt32("GuestOrderId", order.Id);
                         return Redirect(momoResponse.PayUrl);
                     }
                     else
@@ -525,6 +528,9 @@ namespace Ban_Do_An_Vat.Controllers
 
                 // For COD and VietQR, clear session cart and redirect
                 HttpContext.Session.Remove(CartSessionKey);
+                // [SEC-03] Lưu orderId vào session cho guest checkout — duyên tập truy cập Success
+                if (order.UserId == null)
+                    HttpContext.Session.SetInt32("GuestOrderId", order.Id);
                 return RedirectToAction(nameof(Success), new { id = order.Id });
             }
 
@@ -706,14 +712,39 @@ namespace Ban_Do_An_Vat.Controllers
         }
 
         // GET: Cart/Success/5
+        // Yêu cầu đăng nhập hoặc guest có token session hợp lệ.
+        // [SEC-03] Bảo vệ endpoint: user chỉ xem đơn của chính mình.
         public IActionResult Success(int id)
         {
-            var order = _context.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Snack)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Combo)
-                .FirstOrDefault(o => o.Id == id);
+            Order? order;
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                // User đã đăng nhập: chỉ xem đơn gắn với userId của họ
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                order = _context.Orders
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Snack)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Combo)
+                    .FirstOrDefault(o => o.Id == id && o.UserId == userId);
+            }
+            else
+            {
+                // Guest: chỉ xem đơn không gắn userId (đơn guest)
+                // Kiểm tra thêm session để tránh IDOR — orderId phải khớp session
+                var guestOrderId = HttpContext.Session.GetInt32("GuestOrderId");
+                if (guestOrderId == null || guestOrderId != id)
+                {
+                    return NotFound();
+                }
+                order = _context.Orders
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Snack)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Combo)
+                    .FirstOrDefault(o => o.Id == id && o.UserId == null);
+            }
 
             if (order == null)
             {
@@ -724,11 +755,19 @@ namespace Ban_Do_An_Vat.Controllers
         }
 
         // GET: Cart/ConfirmVietQRPayment/5
+        // [SEC-02] Chỉ chủ đơn hàng mới có thể xác nhận thanh toán VietQR.
         [Authorize]
         public IActionResult ConfirmVietQRPayment(int id)
         {
-            var order = _context.Orders.FirstOrDefault(o => o.Id == id);
-            if (order != null && order.PaymentMethod == "VietQR" && order.PaymentStatus == "Unpaid")
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var order = _context.Orders.FirstOrDefault(o => o.Id == id && o.UserId == userId);
+            if (order == null)
+            {
+                // Đơn không tồn tại hoặc không thuộc về user hiện tại
+                return Forbid();
+            }
+
+            if (order.PaymentMethod == "VietQR" && order.PaymentStatus == "Unpaid")
             {
                 order.PaymentStatus = "Paid";
                 order.Status = "Processing";

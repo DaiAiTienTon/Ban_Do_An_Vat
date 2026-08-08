@@ -17,6 +17,11 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        // [SEC-06] Whitelist file upload: chỉ cho phép những đuôi file/MIME type an toàn
+        private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+        private static readonly string[] AllowedMimeTypes = { "image/jpeg", "image/png", "image/webp" };
+        private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+
         public SnacksController(ApplicationDbContext context)
         {
             _context = context;
@@ -47,12 +52,27 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
+                    // [SEC-06] Kiểm tra extension và MIME type
+                    var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+                    if (!AllowedExtensions.Contains(ext) || !AllowedMimeTypes.Contains(ImageFile.ContentType))
+                    {
+                        ModelState.AddModelError("ImageFile", "Chỉ chấp nhận ảnh JPG, PNG hoặc WebP.");
+                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", snack.CategoryId);
+                        return View(snack);
+                    }
+                    if (ImageFile.Length > MaxFileSizeBytes)
+                    {
+                        ModelState.AddModelError("ImageFile", "Ảnh tối đa 5MB.");
+                        ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", snack.CategoryId);
+                        return View(snack);
+                    }
+
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
                     }
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString() + ext;
                     var filePath = Path.Combine(uploadsFolder, fileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
@@ -103,12 +123,27 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                 {
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
+                        // [SEC-06] Kiểm tra extension và MIME type
+                        var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+                        if (!AllowedExtensions.Contains(ext) || !AllowedMimeTypes.Contains(ImageFile.ContentType))
+                        {
+                            ModelState.AddModelError("ImageFile", "Chỉ chấp nhận ảnh JPG, PNG hoặc WebP.");
+                            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", snack.CategoryId);
+                            return View(snack);
+                        }
+                        if (ImageFile.Length > MaxFileSizeBytes)
+                        {
+                            ModelState.AddModelError("ImageFile", "Ảnh tối đa 5MB.");
+                            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", snack.CategoryId);
+                            return View(snack);
+                        }
+
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                         if (!Directory.Exists(uploadsFolder))
                         {
                             Directory.CreateDirectory(uploadsFolder);
                         }
-                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        var fileName = Guid.NewGuid().ToString() + ext;
                         var filePath = Path.Combine(uploadsFolder, fileName);
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {

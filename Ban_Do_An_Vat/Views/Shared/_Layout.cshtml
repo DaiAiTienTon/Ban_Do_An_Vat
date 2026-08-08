@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tiệm Ăn Vặt Lành Mạnh</title>
+    <!-- [UX-06] Meta description mặc định — từng trang có thể ghi đè qua ViewData["MetaDescription"] -->
+    <meta name="description" content="@(ViewData["MetaDescription"] ?? "MUNCHIES — Tiệm ăn vặt lành mạnh với bánh tráng, hạt khô, kẹo nội và nhiều loại đồ ăn vặt Việt Nam chất lượng cao. Giao hàng nhanh, giá tốt.")" />
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,8 +79,15 @@
                 <partial name="_LoginPartial" />
 
                 <!-- Mobile Menu Button -->
-                <button type="button" class="md:hidden p-2 text-brand-forest" onclick="toggleMobileMenu()">
-                    <i id="mobile-menu-icon" class="ph ph-list text-2xl"></i>
+                <!-- [UX-05] Thêm aria-label + aria-expanded cho accessibility -->
+                <button type="button"
+                        id="mobile-menu-btn"
+                        class="md:hidden p-2 text-brand-forest"
+                        aria-label="Mở menu"
+                        aria-expanded="false"
+                        aria-controls="mobile-menu"
+                        onclick="toggleMobileMenu()">
+                    <i id="mobile-menu-icon" class="ph ph-list text-2xl" aria-hidden="true"></i>
                 </button>
             </div>
         </nav>
@@ -123,21 +132,28 @@
             <div>
                 <h4 class="text-xs uppercase tracking-widest font-bold text-brand-amber mb-4">Hỗ Trợ</h4>
                 <ul class="space-y-2 text-sm text-brand-bone/80">
-                    <li><a href="#" class="hover:text-brand-coral transition-colors">Chính sách vận chuyển</a></li>
-                    <li><a href="#" class="hover:text-brand-coral transition-colors">Chính sách đổi trả</a></li>
-                    <li><a href="#" class="hover:text-brand-coral transition-colors">Liên hệ hợp tác</a></li>
+                    <!-- [UX-04] Thay href='#' bằng trang thật hoặc hiển thị thông báo "sắp có" -->
+                    <li><a href="javascript:void(0)" onclick="showComingSoon(this)" class="hover:text-brand-coral transition-colors">Chính sách vận chuyển</a></li>
+                    <li><a href="javascript:void(0)" onclick="showComingSoon(this)" class="hover:text-brand-coral transition-colors">Chính sách đổi trả</a></li>
+                    <li><a href="javascript:void(0)" onclick="showComingSoon(this)" class="hover:text-brand-coral transition-colors">Liên hệ hợp tác</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="hover:text-brand-coral transition-colors">Quyền riêng tư</a></li>
                 </ul>
             </div>
             <div class="space-y-4">
                 <h4 class="text-xs uppercase tracking-widest font-bold text-brand-amber mb-4">Nhận Bản Tin</h4>
                 <p class="text-sm text-brand-bone/70">Đăng ký để nhận thông tin sản phẩm mới và khuyến mãi đặc biệt.</p>
-                <div class="flex gap-2">
-                    <input type="email" placeholder="Email của bạn" class="bg-brand-bone/10 border border-brand-bone/20 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-brand-coral text-white w-full" />
-                    <button class="w-10 h-10 rounded-full bg-brand-coral flex items-center justify-center hover:bg-brand-coral/80 transition-colors">
-                        <i class="ph-bold ph-paper-plane-tilt text-white text-sm"></i>
-                    </button>
-                </div>
+                <!-- [UX-03] Newsletter form — hiển thị toast khi nhấn nút thay vì không phản hồi -->
+                <form onsubmit="handleNewsletter(event)" novalidate>
+                    <div class="flex gap-2">
+                        <input id="newsletter-email" type="email" placeholder="Email của bạn"
+                               aria-label="Email đăng ký bản tin"
+                               class="bg-brand-bone/10 border border-brand-bone/20 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-brand-coral text-white w-full" />
+                        <button type="submit" aria-label="Đăng ký bản tin"
+                                class="w-10 h-10 rounded-full bg-brand-coral flex items-center justify-center hover:bg-brand-coral/80 transition-colors flex-shrink-0">
+                            <i class="ph-bold ph-paper-plane-tilt text-white text-sm" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
         <div class="max-w-7xl mx-auto border-t border-brand-bone/10 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-brand-bone/50 gap-4">
@@ -176,17 +192,24 @@
             updateCartBadge();
         });
 
+        // [UX-05] Cập nhật aria-expanded đúng khi toggle mobile menu
         function toggleMobileMenu() {
             var menu = $('#mobile-menu');
+            var btn  = $('#mobile-menu-btn');
             var icon = $('#mobile-menu-icon');
-            if (menu.hasClass('hidden')) {
-                menu.removeClass('hidden');
-                icon.removeClass('ph-list').addClass('ph-x');
-            } else {
+            var isOpen = !menu.hasClass('hidden');
+            if (isOpen) {
                 menu.addClass('hidden');
                 icon.removeClass('ph-x').addClass('ph-list');
+                btn.attr('aria-expanded', 'false').attr('aria-label', 'Mở menu');
+            } else {
+                menu.removeClass('hidden');
+                icon.removeClass('ph-list').addClass('ph-x');
+                btn.attr('aria-expanded', 'true').attr('aria-label', 'Đóng menu');
             }
         }
+
+    
     </script>
 
     <!-- ===================== CHATBOT AI WIDGET ===================== -->
