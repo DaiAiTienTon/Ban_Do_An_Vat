@@ -763,8 +763,10 @@ namespace Ban_Do_An_Vat.Controllers
             var order = _context.Orders.FirstOrDefault(o => o.Id == id && o.UserId == userId);
             if (order == null)
             {
-                // Đơn không tồn tại hoặc không thuộc về user hiện tại
-                return Forbid();
+                // Đơn không tồn tại hoặc không thuộc về user hiện tại.
+                // Fix 16/08/2026: trả NotFound thay vì Forbid để không báo "bị cấm"
+                // với những đơn không tồn tại (trải nghiệm 403 gây hiểu nhầm cho user).
+                return NotFound();
             }
 
             if (order.PaymentMethod == "VietQR" && order.PaymentStatus == "Unpaid")

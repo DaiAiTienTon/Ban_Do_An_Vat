@@ -138,6 +138,11 @@ namespace Ban_Do_An_Vat
                 app.UseHsts();
             }
 
+            // Fix 16/08/2026: 404/403 trước đây trả về body rỗng (trang trắng).
+            // Re-execute về /Home/Error/{0} để hiển thị trang lỗi thân thiện
+            // (ví dụ xem chi tiết sản phẩm/đơn hàng không tồn tại), giữ nguyên URL gốc.
+            app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

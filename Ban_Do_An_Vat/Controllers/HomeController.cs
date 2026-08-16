@@ -34,10 +34,19 @@ namespace Ban_Do_An_Vat.Controllers
             return View();
         }
 
+        // GET: /Home/Error (xử lý exception) hoặc /Home/Error/404 (xử lý status code)
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? id)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (id.HasValue)
+            {
+                Response.StatusCode = id.Value;
+            }
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                StatusCode = id
+            });
         }
     }
 }
