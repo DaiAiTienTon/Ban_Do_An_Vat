@@ -21,6 +21,11 @@ namespace Ban_Do_An_Vat.Models
         [Display(Name = "Ảnh")]
         public string? ImageUrl { get; set; }
 
+        public byte[]? ImageData { get; set; }
+
+        [StringLength(50)]
+        public string? ImageContentType { get; set; }
+
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         [Range(0, 100000000)]

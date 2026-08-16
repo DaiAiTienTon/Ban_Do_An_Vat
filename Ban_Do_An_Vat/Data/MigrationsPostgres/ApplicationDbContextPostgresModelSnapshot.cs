@@ -100,14 +100,14 @@ namespace Ban_Do_An_Vat.Data.MigrationsPostgres
                             Id = "1",
                             AccessFailedCount = 0,
                             Address = "123 Đường ăn vặt, Sài Gòn",
-                            ConcurrencyStamp = "64a0f56e-06e7-42e0-80ce-76b77c93809e",
+                            ConcurrencyStamp = "2dab26c7-0e14-438c-94e9-14581e0a3f72",
                             Email = "admin@bandoanvat.com",
                             EmailConfirmed = true,
                             FullName = "Hệ thống Munchies",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@BANDOANVAT.COM",
                             NormalizedUserName = "ADMIN@BANDOANVAT.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC8zLj5kHR/QrgL0vO9cLC+7blaxynzfTJE6iK8mOx1k/EyLzc0YNxQg6nC4AaynzA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED8KYW4KNhCMq9bok9REwxKsUzYP/rvZQMGwG8rIcuaeFDgjkymGPjmOEt/Gaudx6Q==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -127,6 +127,13 @@ namespace Ban_Do_An_Vat.Data.MigrationsPostgres
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -188,6 +195,13 @@ namespace Ban_Do_An_Vat.Data.MigrationsPostgres
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
@@ -392,6 +406,13 @@ namespace Ban_Do_An_Vat.Data.MigrationsPostgres
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)

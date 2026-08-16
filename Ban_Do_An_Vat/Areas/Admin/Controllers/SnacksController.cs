@@ -67,22 +67,23 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                         return View(snack);
                     }
 
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    if (!Directory.Exists(uploadsFolder))
+                    using (var ms = new MemoryStream())
                     {
-                        Directory.CreateDirectory(uploadsFolder);
+                        await ImageFile.CopyToAsync(ms);
+                        snack.ImageData = ms.ToArray();
                     }
-                    var fileName = Guid.NewGuid().ToString() + ext;
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(fileStream);
-                    }
-                    snack.ImageUrl = "/uploads/" + fileName;
+                    snack.ImageContentType = ImageFile.ContentType;
+
+                    _context.Snacks.Add(snack);
+                    await _context.SaveChangesAsync();
+
+                    snack.ImageUrl = $"/Image/Snack/{snack.Id}";
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
 
                 _context.Snacks.Add(snack);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", snack.CategoryId);
@@ -138,26 +139,22 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                             return View(snack);
                         }
 
-                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                        if (!Directory.Exists(uploadsFolder))
+                        using (var ms = new MemoryStream())
                         {
-                            Directory.CreateDirectory(uploadsFolder);
+                            await ImageFile.CopyToAsync(ms);
+                            snack.ImageData = ms.ToArray();
                         }
-                        var fileName = Guid.NewGuid().ToString() + ext;
-                        var filePath = Path.Combine(uploadsFolder, fileName);
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await ImageFile.CopyToAsync(fileStream);
-                        }
-                        snack.ImageUrl = "/uploads/" + fileName;
+                        snack.ImageContentType = ImageFile.ContentType;
+                        snack.ImageUrl = $"/Image/Snack/{snack.Id}";
                     }
                     else
                     {
-                        // Keep old ImageUrl if empty
-                        if (string.IsNullOrEmpty(snack.ImageUrl))
+                        var originalSnack = await _context.Snacks.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                        if (originalSnack != null)
                         {
-                            var originalSnack = _context.Snacks.AsNoTracking().FirstOrDefault(s => s.Id == id);
-                            if (originalSnack != null)
+                            snack.ImageData = originalSnack.ImageData;
+                            snack.ImageContentType = originalSnack.ImageContentType;
+                            if (string.IsNullOrEmpty(snack.ImageUrl))
                             {
                                 snack.ImageUrl = originalSnack.ImageUrl;
                             }
@@ -165,7 +162,7 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                     }
 
                     _context.Update(snack);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {

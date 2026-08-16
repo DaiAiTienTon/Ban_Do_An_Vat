@@ -14,6 +14,11 @@ namespace Ban_Do_An_Vat.Models
         [StringLength(500)]
         public string ImageUrl { get; set; }
 
+        public byte[]? ImageData { get; set; }
+
+        [StringLength(50)]
+        public string? ImageContentType { get; set; }
+
         [StringLength(200)]
         public string Description { get; set; }
 

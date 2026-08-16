@@ -54,20 +54,23 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    if (!Directory.Exists(uploadsFolder))
-                        Directory.CreateDirectory(uploadsFolder);
-
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        await ImageFile.CopyToAsync(fileStream);
-                    combo.ImageUrl = "/uploads/" + fileName;
+                    using (var ms = new MemoryStream())
+                    {
+                        await ImageFile.CopyToAsync(ms);
+                        combo.ImageData = ms.ToArray();
+                    }
+                    combo.ImageContentType = ImageFile.ContentType;
                 }
 
                 combo.CreatedAt = DateTime.UtcNow;
                 _context.Combos.Add(combo);
                 await _context.SaveChangesAsync();
+
+                if (combo.ImageData != null && combo.ImageData.Length > 0)
+                {
+                    combo.ImageUrl = $"/Image/Combo/{combo.Id}";
+                    await _context.SaveChangesAsync();
+                }
 
                 // Add combo items
                 for (int i = 0; i < SnackIds.Count; i++)
@@ -134,20 +137,26 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
                 {
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
-                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                        if (!Directory.Exists(uploadsFolder))
-                            Directory.CreateDirectory(uploadsFolder);
-
-                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                        var filePath = Path.Combine(uploadsFolder, fileName);
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                            await ImageFile.CopyToAsync(fileStream);
-                        combo.ImageUrl = "/uploads/" + fileName;
+                        using (var ms = new MemoryStream())
+                        {
+                            await ImageFile.CopyToAsync(ms);
+                            combo.ImageData = ms.ToArray();
+                        }
+                        combo.ImageContentType = ImageFile.ContentType;
+                        combo.ImageUrl = $"/Image/Combo/{combo.Id}";
                     }
-                    else if (string.IsNullOrEmpty(combo.ImageUrl))
+                    else
                     {
                         var original = await _context.Combos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-                        combo.ImageUrl = original?.ImageUrl;
+                        if (original != null)
+                        {
+                            combo.ImageData = original.ImageData;
+                            combo.ImageContentType = original.ImageContentType;
+                            if (string.IsNullOrEmpty(combo.ImageUrl))
+                            {
+                                combo.ImageUrl = original.ImageUrl;
+                            }
+                        }
                     }
 
                     _context.Update(combo);

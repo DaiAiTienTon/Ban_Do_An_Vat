@@ -36,12 +36,29 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
         // POST: Admin/Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ImageUrl,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,ImageUrl,Description")] Category category, IFormFile? ImageFile)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await ImageFile.CopyToAsync(ms);
+                        category.ImageData = ms.ToArray();
+                    }
+                    category.ImageContentType = ImageFile.ContentType;
+                }
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
+
+                if (category.ImageData != null && category.ImageData.Length > 0)
+                {
+                    category.ImageUrl = $"/Image/Category/{category.Id}";
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ActivePage"] = "Categories";
@@ -68,7 +85,7 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
         // POST: Admin/Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ImageUrl,Description")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ImageUrl,Description")] Category category, IFormFile? ImageFile)
         {
             if (id != category.Id)
             {
@@ -79,6 +96,30 @@ namespace Ban_Do_An_Vat.Areas.Admin.Controllers
             {
                 try
                 {
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            await ImageFile.CopyToAsync(ms);
+                            category.ImageData = ms.ToArray();
+                        }
+                        category.ImageContentType = ImageFile.ContentType;
+                        category.ImageUrl = $"/Image/Category/{category.Id}";
+                    }
+                    else
+                    {
+                        var original = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                        if (original != null)
+                        {
+                            category.ImageData = original.ImageData;
+                            category.ImageContentType = original.ImageContentType;
+                            if (string.IsNullOrEmpty(category.ImageUrl))
+                            {
+                                category.ImageUrl = original.ImageUrl;
+                            }
+                        }
+                    }
+
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
